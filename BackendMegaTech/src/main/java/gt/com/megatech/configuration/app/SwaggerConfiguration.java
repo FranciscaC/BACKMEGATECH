@@ -30,11 +30,11 @@ import org.springframework.http.HttpHeaders;
         servers = {
                 @Server(
                         description = "DEVELOPMENT SERVER",
-                        url = "http://localhost:8080"
+                        url = "http://localhost:8081"
                 ),
                 @Server(
                         description = "TESTING SERVER",
-                        url = "http://localhost:8080"
+                        url = "http://localhost:8082"
                 ),
                 @Server(
                         description = "PRODUCTION SERVER",
