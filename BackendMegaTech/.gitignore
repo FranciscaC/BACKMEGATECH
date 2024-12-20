@@ -31,8 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### REPOSITORY ###
-*.properties
-!application-development.properties
-!application-testing.properties

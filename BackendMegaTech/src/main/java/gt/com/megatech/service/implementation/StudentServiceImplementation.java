@@ -41,7 +41,7 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional
     @Override
-    public StudentDTO saveStudentWithExistingGuardian(StudentDTO studentDTO) {
+    public StudentDTO saveStudent(StudentDTO studentDTO) {
         if (iStudentRepository.existsByName(studentDTO.getName())) {
             throw new IllegalArgumentException("A student with this name already exists.");
         }
@@ -57,23 +57,6 @@ public class StudentServiceImplementation implements IStudentService {
         studentEntity.setGuardianEntity(guardianEntityExists);
         StudentEntity studentEntitySaved = this.iStudentRepository.save(studentEntity);
         return this.convertToStudentDTO(studentEntitySaved);
-    }
-
-    @Transactional
-    @Override
-    public StudentDTO saveStudentWithNewGuardian(StudentDTO studentDTO) {
-        if (iStudentRepository.existsByName(studentDTO.getName())) {
-            throw new IllegalArgumentException("A student with this name already exists.");
-        }
-        if (iStudentRepository.existsByPhone(studentDTO.getPhone())) {
-            throw new IllegalArgumentException("A student with this phone number already exists.");
-        }
-        if (iStudentRepository.existsByEmail(studentDTO.getEmail())) {
-            throw new IllegalArgumentException("A student with this email number already exists.");
-        }
-        StudentEntity studentEntity = convertToStudentEntity(studentDTO);
-        StudentEntity studentEntitySaved = this.iStudentRepository.save(studentEntity);
-        return convertToStudentDTO(studentEntitySaved);
     }
 
     @Transactional

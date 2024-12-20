@@ -10,9 +10,7 @@ public interface IStudentService {
 
     StudentDTO findByIdStudent(Long id);
 
-    StudentDTO saveStudentWithExistingGuardian(StudentDTO studentDTO);
-
-    StudentDTO saveStudentWithNewGuardian(StudentDTO studentDTO);
+    StudentDTO saveStudent(StudentDTO studentDTO);
 
     StudentDTO updateStudent(Long id, StudentDTO studentDTO);
 

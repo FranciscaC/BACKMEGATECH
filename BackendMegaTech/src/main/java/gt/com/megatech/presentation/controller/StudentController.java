@@ -52,17 +52,7 @@ public class StudentController {
     @PostMapping
     public ResponseEntity<?> saveStudent(@RequestBody @Valid StudentDTO studentDTO) {
         EntityModel<StudentDTO> studentDTOEntityModel = studentModelAssembler
-                .toModel(this.iStudentService.saveStudentWithExistingGuardian(studentDTO));
-        return ResponseEntity
-                .created(studentDTOEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(studentDTOEntityModel);
-    }
-
-    @PreAuthorize("hasAuthority('CREATE')")
-    @PostMapping("/whit-guardian")
-    public ResponseEntity<?> saveStudentWithNewGuardian(@RequestBody @Valid StudentDTO studentDTO) {
-        EntityModel<StudentDTO> studentDTOEntityModel = studentModelAssembler
-                .toModel(this.iStudentService.saveStudentWithExistingGuardian(studentDTO));
+                .toModel(this.iStudentService.saveStudent(studentDTO));
         return ResponseEntity
                 .created(studentDTOEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(studentDTOEntityModel);
