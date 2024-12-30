@@ -55,4 +55,7 @@ public class StudentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guardian_id", nullable = false)
     private GuardianEntity guardianEntity;
+
+    @OneToOne(mappedBy = "studentEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private EnrollmentEntity enrollmentEntity;
 }

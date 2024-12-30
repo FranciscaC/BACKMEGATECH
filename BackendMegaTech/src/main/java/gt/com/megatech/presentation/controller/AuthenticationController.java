@@ -23,6 +23,9 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthLoginRequestDTO authLoginRequestDTO) {
-        return new ResponseEntity<>(this.userDetailServiceImplementation.loginUser(authLoginRequestDTO), HttpStatus.OK);
+        return new ResponseEntity<>(
+                this.userDetailServiceImplementation.loginUser(authLoginRequestDTO),
+                HttpStatus.OK
+        );
     }
 }

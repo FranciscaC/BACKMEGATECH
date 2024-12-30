@@ -38,7 +38,7 @@ import org.springframework.http.HttpHeaders;
                 ),
                 @Server(
                         description = "PRODUCTION SERVER",
-                        url = "http://localhost:8080"
+                        url = "https://backendmegatech-production.up.railway.app"
                 )
         },
         security = @SecurityRequirement(

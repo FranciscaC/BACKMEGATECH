@@ -35,10 +35,10 @@ public class GuardianEntity {
     private String phone;
 
     @NotBlank(message = "The address must not be empty")
-    @Size(min = 10, max = 200, message = "The address must be between 10 and 200 characters.")
+    @Size(min = 5, max = 200, message = "The address must be between 10 and 200 characters.")
     @Column(length = 200, nullable = false)
     private String address;
 
-    @OneToMany(mappedBy = "guardianEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "guardianEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<StudentEntity> studentEntities = new HashSet<>();
 }

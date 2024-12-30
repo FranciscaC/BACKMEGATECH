@@ -12,9 +12,12 @@ import gt.com.megatech.persistence.entity.RoleEntity;
 import gt.com.megatech.persistence.entity.UserEntity;
 import gt.com.megatech.persistence.repository.IRoleRepository;
 import gt.com.megatech.persistence.repository.IUserRepository;
+import gt.com.megatech.util.constant.SecurityConstant;
 import gt.com.megatech.util.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,6 +34,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailServiceImplementation implements UserDetailsService {
 
+    public static final String DOES_NOT_EXIST = "does not exist.";
     private final IRoleRepository iRoleRepository;
     private final IUserRepository iUserRepository;
     private final JwtUtils jwtUtils;
@@ -39,11 +43,11 @@ public class UserDetailServiceImplementation implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = iUserRepository.findUserEntityByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("The user" + username + " does not exist."));
+                .orElseThrow(() -> new UsernameNotFoundException("The user" + username + " " + DOES_NOT_EXIST));
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         userEntity
                 .getRoles()
-                .forEach(role -> authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRoleEnum().name()))));
+                .forEach(role -> authorityList.add(new SimpleGrantedAuthority(SecurityConstant.ROLE_PREFIX.concat(role.getRoleEnum().name()))));
         userEntity
                 .getRoles()
                 .stream()
@@ -94,7 +98,7 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         List<String> roleRequest = authCreateUserRequestDTO.authCreateRoleRequestDTO().roleListName();
         Set<RoleEntity> roleEntitySet = new HashSet<>(iRoleRepository.findRoleEntitiesByRoleEnumIn(roleRequest));
         if (roleEntitySet.isEmpty()) {
-            throw new IllegalArgumentException("The roles specified does not exist.");
+            throw new IllegalArgumentException("The roles specified " + " " + DOES_NOT_EXIST);
         }
         UserEntity userEntity = UserEntity
                 .builder()
@@ -106,7 +110,7 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         ArrayList<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         userCreated
                 .getRoles()
-                .forEach(role -> authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRoleEnum().name()))));
+                .forEach(role -> authorityList.add(new SimpleGrantedAuthority(SecurityConstant.ROLE_PREFIX.concat(role.getRoleEnum().name()))));
         userCreated
                 .getRoles()
                 .stream()
@@ -127,7 +131,7 @@ public class UserDetailServiceImplementation implements UserDetailsService {
 
     public AuthResponseDTO updateUser(String username, AuthCreateUserRequestDTO authCreateUserRequestDTO) {
         UserEntity existingUser = iUserRepository.findUserEntityByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " does not exist."));
+                .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " " + DOES_NOT_EXIST));
         existingUser.setUsername(authCreateUserRequestDTO.username());
         if (authCreateUserRequestDTO.password() != null && !authCreateUserRequestDTO.password().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(authCreateUserRequestDTO.password()));
@@ -136,7 +140,7 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         ArrayList<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         updatedUser
                 .getRoles()
-                .forEach(role -> authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRoleEnum().name()))));
+                .forEach(role -> authorityList.add(new SimpleGrantedAuthority(SecurityConstant.ROLE_PREFIX.concat(role.getRoleEnum().name()))));
         updatedUser
                 .getRoles()
                 .stream()
@@ -153,11 +157,15 @@ public class UserDetailServiceImplementation implements UserDetailsService {
 
     public void deleteUser(String username) {
         UserEntity existingUser = iUserRepository.findUserEntityByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " does not exist."));
+                .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " " + DOES_NOT_EXIST));
         iUserRepository.delete(existingUser);
     }
 
     public List<UserEntity> findAllUsers() {
         return iUserRepository.findAll();
+    }
+
+    public Page<UserEntity> findAllUsersPaged(Pageable pageable) {
+        return iUserRepository.findAll(pageable);
     }
 }

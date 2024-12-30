@@ -1,11 +1,11 @@
 package gt.com.megatech.persistence.repository;
 
-import gt.com.megatech.persistence.entity.StudentEntity;
+import gt.com.megatech.persistence.entity.ProfessorEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
+public interface IProfessorRepository extends JpaRepository<ProfessorEntity, Long> {
 
     boolean existsByName(String name);
 

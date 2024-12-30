@@ -10,6 +10,8 @@ import gt.com.megatech.service.exception.GuardianNotFoundException;
 import gt.com.megatech.service.exception.StudentNotFoundException;
 import gt.com.megatech.service.interfaces.IStudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,13 @@ public class StudentServiceImplementation implements IStudentService {
                 .stream()
                 .map(this::convertToStudentDTO)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<StudentDTO> findAllStudentPaged(Pageable pageable) {
+        return this.iStudentRepository.findAll(pageable)
+                .map(this::convertToStudentDTO);
     }
 
     @Transactional(readOnly = true)

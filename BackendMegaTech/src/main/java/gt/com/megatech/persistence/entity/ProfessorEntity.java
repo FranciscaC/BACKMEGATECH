@@ -42,8 +42,4 @@ public class ProfessorEntity {
     @Size(min = 10, max = 200, message = "The address must be between 10 and 200 characters.")
     @Column(length = 200, nullable = false)
     private String address;
-
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean status = true;
 }

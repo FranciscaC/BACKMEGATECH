@@ -2,12 +2,16 @@ package gt.com.megatech.service.implementation;
 
 import gt.com.megatech.persistence.entity.GuardianEntity;
 import gt.com.megatech.persistence.entity.StudentEntity;
+import gt.com.megatech.persistence.repository.IEnrollmentRepository;
 import gt.com.megatech.persistence.repository.IGuardianRepository;
+import gt.com.megatech.persistence.repository.IStudentRepository;
 import gt.com.megatech.presentation.dto.GuardianDTO;
 import gt.com.megatech.presentation.dto.StudentDTO;
 import gt.com.megatech.service.exception.GuardianNotFoundException;
 import gt.com.megatech.service.interfaces.IGuardianService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 public class GuardianServiceImplementation implements IGuardianService {
 
     private final IGuardianRepository iGuardianRepository;
+    private final IStudentRepository iStudentRepository;
+    private final IEnrollmentRepository iEnrollmentRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -32,11 +38,25 @@ public class GuardianServiceImplementation implements IGuardianService {
 
     @Transactional(readOnly = true)
     @Override
+    public Page<GuardianDTO> findAllGuardiansPaged(Pageable pageable) {
+        return this.iGuardianRepository.findAll(pageable)
+                .map(this::convertToGuardianDTOWithoutStudents);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public List<GuardianDTO> findAllGuardiansWithStudents() {
         return this.iGuardianRepository.findAllGuardiansWithStudents()
                 .stream()
                 .map(this::convertToGuardianDTO)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<GuardianDTO> findAllGuardiansWithStudentsPaged(Pageable pageable) {
+        return this.iGuardianRepository.findAllGuardiansWithStudents(pageable)
+                .map(this::convertToGuardianDTO);
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +106,15 @@ public class GuardianServiceImplementation implements IGuardianService {
     public void deleteGuardian(Long id) {
         GuardianEntity guardianEntity = this.iGuardianRepository.findById(id)
                 .orElseThrow(() -> new GuardianNotFoundException(id));
+        guardianEntity.getStudentEntities().forEach(student -> {
+            if (student.getEnrollmentEntity() != null) {
+                this.iEnrollmentRepository.delete(student.getEnrollmentEntity());
+            }
+            this.iStudentRepository.delete(student);
+        });
+        guardianEntity.getStudentEntities().clear();
         this.iGuardianRepository.delete(guardianEntity);
+        this.iGuardianRepository.flush();
     }
 
     private GuardianDTO convertToGuardianDTO(GuardianEntity guardianEntity) {
