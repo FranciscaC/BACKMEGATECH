@@ -1,5 +1,7 @@
 package gt.com.megatech.persistence.entity;
 
+import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
+import gt.com.megatech.persistence.entity.enums.EducationLevelEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "students")
+@ToString
 public class StudentEntity {
 
     @Id
@@ -46,10 +49,13 @@ public class StudentEntity {
     @Column(length = 200, nullable = false)
     private String address;
 
-    @NotBlank(message = "The education level must not be empty.")
-    @Size(min = 5, max = 50, message = "The education level must be between 5 and 50 characters.")
-    @Column(name = "education_level", length = 50, nullable = false)
-    private String educationLevel;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "education_level", nullable = false)
+    private EducationLevelEnum educationLevelEnum;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "academic_status")
+    private AcademicStatusEnum academicStatusEnum;
 
     @NotNull(message = "The student must have a guardian")
     @ManyToOne(fetch = FetchType.LAZY)

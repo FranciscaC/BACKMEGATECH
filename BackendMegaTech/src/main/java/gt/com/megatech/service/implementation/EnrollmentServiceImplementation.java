@@ -102,7 +102,7 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
                 .phone(studentEntity.getPhone())
                 .email(studentEntity.getEmail())
                 .address(studentEntity.getAddress())
-                .educationLevel(studentEntity.getEducationLevel())
+                .educationLevelEnum(studentEntity.getEducationLevelEnum())
                 .build();
     }
 }

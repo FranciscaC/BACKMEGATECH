@@ -2,7 +2,7 @@ package gt.com.megatech;
 
 import gt.com.megatech.persistence.entity.PermissionEntity;
 import gt.com.megatech.persistence.entity.RoleEntity;
-import gt.com.megatech.persistence.entity.RoleEnum;
+import gt.com.megatech.persistence.entity.enums.RoleEnum;
 import gt.com.megatech.persistence.entity.UserEntity;
 import gt.com.megatech.persistence.repository.IUserRepository;
 import org.springframework.boot.CommandLineRunner;

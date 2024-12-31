@@ -1,5 +1,6 @@
 package gt.com.megatech.persistence.entity;
 
+import gt.com.megatech.persistence.entity.enums.RoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
@@ -21,8 +22,8 @@ public class RoleEntity {
     @SequenceGenerator(name = "role_seq", sequenceName = "role_sequence", allocationSize = 1)
     private Long id;
 
-    @Column(name = "role_name", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
+    @Column(name = "role_name", nullable = false, unique = true)
     private RoleEnum roleEnum;
 
     @NotEmpty(message = "A role must have at least one permission.")

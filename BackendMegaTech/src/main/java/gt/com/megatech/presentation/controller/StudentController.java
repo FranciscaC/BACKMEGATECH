@@ -35,32 +35,66 @@ public class StudentController {
 
     @PreAuthorize("hasAuthority('READ')")
     @GetMapping
-    public CollectionModel<EntityModel<StudentDTO>> findAllStudent() {
-        List<EntityModel<StudentDTO>> students = this.iStudentService.findAllStudent()
+    public CollectionModel<EntityModel<StudentDTO>> findAllStudyingStudents() {
+        List<EntityModel<StudentDTO>> students = this.iStudentService.findAllStudyingStudents()
                 .stream()
                 .map(studentModelAssembler::toModel)
                 .toList();
         return CollectionModel.of(
                 students,
-                linkTo(methodOn(StudentController.class).findAllStudent()).withSelfRel()
+                linkTo(methodOn(StudentController.class).findAllStudyingStudents()).withSelfRel()
+        );
+    }
+
+    @PreAuthorize("hasAuthority('READ')")
+    @GetMapping("/graduated")
+    public CollectionModel<EntityModel<StudentDTO>> findAllGraduatedStudents() {
+
+        List<EntityModel<StudentDTO>> students = this.iStudentService.findAllGraduatedStudents()
+                .stream()
+                .map(studentModelAssembler::toModel)
+                .toList();
+
+        return CollectionModel.of(
+                students,
+                linkTo(methodOn(StudentController.class).findAllGraduatedStudents()).withSelfRel()
         );
     }
 
     @PreAuthorize("hasAuthority('READ')")
     @GetMapping("/paged")
-    public ResponseEntity<PagedModel<EntityModel<StudentDTO>>> findAllStudentPaged(
+    public ResponseEntity<PagedModel<EntityModel<StudentDTO>>> findAllStudyingStudentsPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable
     ) {
         Pageable customPageable = PageRequest.of(page, size, pageable.getSort());
-        Page<StudentDTO> studentDTOPage = this.iStudentService.findAllStudentPaged(customPageable);
+        Page<StudentDTO> studentDTOPage = this.iStudentService.findAllStudyingStudentsPaged(customPageable);
         PagedModel<EntityModel<StudentDTO>> entityModelPagedModel = studentDTOPagedResourcesAssembler.toModel(
                 studentDTOPage,
                 studentModelAssembler
         );
         return ResponseEntity.ok(entityModelPagedModel);
     }
+
+    @PreAuthorize("hasAuthority('READ')")
+    @GetMapping("/paged/graduated")
+    public ResponseEntity<PagedModel<EntityModel<StudentDTO>>> findAllGraduatedStudentsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Pageable pageable) {
+
+        Pageable customPageable = PageRequest.of(page, size, pageable.getSort());
+        Page<StudentDTO> studentDTOPage = this.iStudentService.findAllGraduatedStudentsPaged(customPageable);
+
+        PagedModel<EntityModel<StudentDTO>> entityModelPagedModel = studentDTOPagedResourcesAssembler.toModel(
+                studentDTOPage,
+                studentModelAssembler
+        );
+
+        return ResponseEntity.ok(entityModelPagedModel);
+    }
+
 
     @PreAuthorize("hasAuthority('READ')")
     @GetMapping("/{id}")
@@ -87,6 +121,14 @@ public class StudentController {
         return ResponseEntity
                 .created(studentDTOEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(studentDTOEntityModel);
+    }
+
+    @PreAuthorize("hasAuthority('UPDATE')")
+    @PutMapping("/{id}/graduate-student")
+    public ResponseEntity<EntityModel<StudentDTO>> updateAcademicStatusToGraduated(@PathVariable Long id) {
+        EntityModel<StudentDTO> studentDTOEntityModel = studentModelAssembler
+                .toModel(this.iStudentService.updateAcademicStatusToGraduated(id));
+        return ResponseEntity.ok(studentDTOEntityModel);
     }
 
     @PreAuthorize("hasAuthority('DELETE')")

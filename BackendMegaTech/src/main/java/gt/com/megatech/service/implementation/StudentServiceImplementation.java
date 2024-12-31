@@ -2,6 +2,7 @@ package gt.com.megatech.service.implementation;
 
 import gt.com.megatech.persistence.entity.GuardianEntity;
 import gt.com.megatech.persistence.entity.StudentEntity;
+import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
 import gt.com.megatech.persistence.repository.IGuardianRepository;
 import gt.com.megatech.persistence.repository.IStudentRepository;
 import gt.com.megatech.presentation.dto.GuardianDTO;
@@ -26,8 +27,8 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<StudentDTO> findAllStudent() {
-        return this.iStudentRepository.findAll()
+    public List<StudentDTO> findAllStudyingStudents() {
+        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.STUDYING)
                 .stream()
                 .map(this::convertToStudentDTO)
                 .toList();
@@ -35,17 +36,33 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<StudentDTO> findAllStudentPaged(Pageable pageable) {
-        return this.iStudentRepository.findAll(pageable)
+    public List<StudentDTO> findAllGraduatedStudents() {
+        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.GRADUATED)
+                .stream()
+                .map(this::convertToStudentDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<StudentDTO> findAllStudyingStudentsPaged(Pageable pageable) {
+        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.STUDYING, pageable)
+                .map(this::convertToStudentDTO);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<StudentDTO> findAllGraduatedStudentsPaged(Pageable pageable) {
+        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.GRADUATED, pageable)
                 .map(this::convertToStudentDTO);
     }
 
     @Transactional(readOnly = true)
     @Override
     public StudentDTO findByIdStudent(Long id) {
-        StudentEntity studentEntity = this.iStudentRepository.findById(id)
+        StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
-        return this.convertToStudentDTO(studentEntity);
+        return this.convertToStudentDTO(studentEntityExists);
     }
 
     @Transactional
@@ -63,6 +80,13 @@ public class StudentServiceImplementation implements IStudentService {
         GuardianEntity guardianEntityExists = this.iGuardianRepository.findById(studentDTO.getGuardianDTO().getId())
                 .orElseThrow(() -> new GuardianNotFoundException(studentDTO.getGuardianDTO().getId()));
         StudentEntity studentEntity = this.convertToStudentEntity(studentDTO);
+        studentEntity.setName(studentDTO.getName());
+        studentEntity.setBirthDate(studentDTO.getBirthDate());
+        studentEntity.setPhone(studentDTO.getPhone());
+        studentEntity.setEmail(studentDTO.getEmail());
+        studentEntity.setAddress(studentDTO.getAddress());
+        studentEntity.setEducationLevelEnum(studentDTO.getEducationLevelEnum());
+        studentEntity.setAcademicStatusEnum(AcademicStatusEnum.STUDYING);
         studentEntity.setGuardianEntity(guardianEntityExists);
         StudentEntity studentEntitySaved = this.iStudentRepository.save(studentEntity);
         return this.convertToStudentDTO(studentEntitySaved);
@@ -78,17 +102,33 @@ public class StudentServiceImplementation implements IStudentService {
         studentEntityExists.setPhone(studentDTO.getPhone());
         studentEntityExists.setEmail(studentDTO.getEmail());
         studentEntityExists.setAddress(studentDTO.getAddress());
-        studentEntityExists.setEducationLevel(studentDTO.getEducationLevel());
+        studentEntityExists.setEducationLevelEnum(studentDTO.getEducationLevelEnum());
+        studentEntityExists.setAcademicStatusEnum(studentDTO.getAcademicStatusEnum());
         StudentEntity studentUpdated = this.iStudentRepository.save(studentEntityExists);
         return convertToStudentDTO(studentUpdated);
     }
 
     @Transactional
     @Override
-    public void deleteStudent(Long id) {
-        StudentEntity studentEntity = this.iStudentRepository.findById(id)
+    public StudentDTO updateAcademicStatusToGraduated(Long id) {
+        if (!this.iStudentRepository.existsById(id)) {
+            throw new StudentNotFoundException(id);
+        }
+        int rowsUpdated = this.iStudentRepository.updateAcademicStatusById(id, AcademicStatusEnum.GRADUATED);
+        if (rowsUpdated == 0) {
+            throw new IllegalStateException("No se pudo actualizar el estado académico.");
+        }
+        StudentEntity updatedStudent = this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
-        this.iStudentRepository.delete(studentEntity);
+        return convertToStudentDTO(updatedStudent);
+    }
+
+    @Transactional
+    @Override
+    public void deleteStudent(Long id) {
+        StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id));
+        this.iStudentRepository.delete(studentEntityExists);
     }
 
     private StudentDTO convertToStudentDTO(StudentEntity studentEntity) {
@@ -99,7 +139,8 @@ public class StudentServiceImplementation implements IStudentService {
                 .phone(studentEntity.getPhone())
                 .email(studentEntity.getEmail())
                 .address(studentEntity.getAddress())
-                .educationLevel(studentEntity.getEducationLevel())
+                .educationLevelEnum(studentEntity.getEducationLevelEnum())
+                .academicStatusEnum(studentEntity.getAcademicStatusEnum())
                 .guardianDTO(convertToGuardianDTO(studentEntity.getGuardianEntity()))
                 .build();
     }
@@ -111,7 +152,8 @@ public class StudentServiceImplementation implements IStudentService {
                 .phone(studentDTO.getPhone())
                 .email(studentDTO.getEmail())
                 .address(studentDTO.getAddress())
-                .educationLevel(studentDTO.getEducationLevel())
+                .educationLevelEnum(studentDTO.getEducationLevelEnum())
+                .academicStatusEnum(studentDTO.getAcademicStatusEnum())
                 .build();
     }
 

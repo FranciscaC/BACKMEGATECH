@@ -131,7 +131,7 @@ public class GuardianServiceImplementation implements IGuardianService {
                                 .phone(studentEntity.getPhone())
                                 .email(studentEntity.getEmail())
                                 .address(studentEntity.getAddress())
-                                .educationLevel(studentEntity.getEducationLevel())
+                                .educationLevelEnum(studentEntity.getEducationLevelEnum())
                                 .build())
                         .collect(Collectors.toSet()))
                 .build();
@@ -150,7 +150,7 @@ public class GuardianServiceImplementation implements IGuardianService {
                                 .phone(studentDTO.getPhone())
                                 .email(studentDTO.getEmail())
                                 .address(studentDTO.getAddress())
-                                .educationLevel(studentDTO.getEducationLevel())
+                                .educationLevelEnum(studentDTO.getEducationLevelEnum())
                                 .build())
                         .collect(Collectors.toSet()))
                 .build();
