@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import gt.com.megatech.presentation.dto.AuthCreateUserRequestDTO;
 import gt.com.megatech.presentation.dto.AuthLoginRequestDTO;
 import gt.com.megatech.presentation.dto.AuthResponseDTO;
@@ -12,6 +13,7 @@ import gt.com.megatech.persistence.entity.RoleEntity;
 import gt.com.megatech.persistence.entity.UserEntity;
 import gt.com.megatech.persistence.repository.IRoleRepository;
 import gt.com.megatech.persistence.repository.IUserRepository;
+import gt.com.megatech.presentation.dto.UserProfileResponseDTO;
 import gt.com.megatech.util.constant.SecurityConstant;
 import gt.com.megatech.util.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -167,5 +169,22 @@ public class UserDetailServiceImplementation implements UserDetailsService {
 
     public Page<UserEntity> findAllUsersPaged(Pageable pageable) {
         return iUserRepository.findAll(pageable);
+    }
+
+    public UserProfileResponseDTO getUserProfileFromToken(String token) {
+        String jwtToken = token.substring(7);
+        DecodedJWT decodedJWT = jwtUtils.validatedToken(jwtToken);
+        String username = decodedJWT.getSubject();
+        return this.getUserProfile(username);
+    }
+
+    public UserProfileResponseDTO getUserProfile(String username) {
+        UserEntity userEntity = iUserRepository.findUserEntityByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " does not exist."));
+        List<String> roles = userEntity.getRoles()
+                .stream()
+                .map(roleEntity -> roleEntity.getRoleEnum().name())
+                .toList();
+        return new UserProfileResponseDTO(userEntity.getUsername(), roles);
     }
 }
