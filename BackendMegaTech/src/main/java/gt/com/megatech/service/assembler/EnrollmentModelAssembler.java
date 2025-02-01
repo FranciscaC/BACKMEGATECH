@@ -14,11 +14,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EnrollmentModelAssembler implements RepresentationModelAssembler<EnrollmentDTO, EntityModel<EnrollmentDTO>> {
 
     @Override
-    public @NonNull EntityModel<EnrollmentDTO> toModel(@NonNull EnrollmentDTO enrollmentDTO) {
+    public @NonNull EntityModel<EnrollmentDTO> toModel(
+            @NonNull EnrollmentDTO enrollmentDTO
+    ) {
         return EntityModel.of(
                 enrollmentDTO,
-                linkTo(methodOn(EnrollmentController.class).findByIdEnrollment(enrollmentDTO.getId())).withSelfRel(),
-                linkTo(methodOn(EnrollmentController.class).findAllEnrollments()).withRel("enrollment")
+                linkTo(methodOn(EnrollmentController.class)
+                        .findByIdEnrollment(enrollmentDTO.getId()))
+                        .withSelfRel(),
+                linkTo(methodOn(EnrollmentController.class)
+                        .findAllEnrollments())
+                        .withRel("enrollment")
         );
     }
 }

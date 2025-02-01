@@ -11,11 +11,14 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(
+        JsonInclude.Include.NON_EMPTY
+)
 public class GuardianDTO {
 
     private Long id;
     private String name;
+    private String dpi;
     private String phone;
     private String address;
     private Set<StudentDTO> studentDTOS = new HashSet<>();

@@ -14,7 +14,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "roles")
+@Table(
+        name = "roles"
+)
 public class RoleEntity {
 
     @Id
@@ -48,8 +50,12 @@ public class RoleEntity {
     )
     @JoinTable(
             name = "role_permissions",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id")
+            joinColumns = @JoinColumn(
+                    name = "role_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "permission_id"
+            )
     )
     private Set<PermissionEntity> permissionList = new HashSet<>();
 }

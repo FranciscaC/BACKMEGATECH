@@ -14,13 +14,23 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class GuardianModelAssembler implements RepresentationModelAssembler<GuardianDTO, EntityModel<GuardianDTO>> {
 
     @Override
-    public @NonNull EntityModel<GuardianDTO> toModel(@NonNull GuardianDTO guardianDTO) {
+    public @NonNull EntityModel<GuardianDTO> toModel(
+            @NonNull GuardianDTO guardianDTO
+    ) {
         return EntityModel.of(
                 guardianDTO,
-                linkTo(methodOn(GuardianController.class).findGuardianById(guardianDTO.getId())).withSelfRel(),
-                linkTo(methodOn(GuardianController.class).findGuardianByIdWithStudents(guardianDTO.getId())).withRel("guardian-with-students"),
-                linkTo(methodOn(GuardianController.class).findAllGuardians()).withRel("guardian"),
-                linkTo(methodOn(GuardianController.class).findAllGuardiansWithStudents()).withRel("guardians-with-students")
+                linkTo(methodOn(GuardianController.class)
+                        .findGuardianById(guardianDTO.getId()))
+                        .withSelfRel(),
+                linkTo(methodOn(GuardianController.class)
+                        .findGuardianByIdWithStudents(guardianDTO.getId()))
+                        .withRel("guardian-with-students"),
+                linkTo(methodOn(GuardianController.class)
+                        .findAllGuardians())
+                        .withRel("guardian"),
+                linkTo(methodOn(GuardianController.class)
+                        .findAllGuardiansWithStudents())
+                        .withRel("guardian-with-students")
         );
     }
 }

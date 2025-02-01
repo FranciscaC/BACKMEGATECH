@@ -15,7 +15,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users"
+)
 public class UserEntity {
 
     @Id
@@ -95,8 +97,12 @@ public class UserEntity {
     )
     @JoinTable(
             name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            joinColumns = @JoinColumn(
+                    name = "user_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id"
+            )
     )
     private Set<RoleEntity> roles = new HashSet<>();
 }

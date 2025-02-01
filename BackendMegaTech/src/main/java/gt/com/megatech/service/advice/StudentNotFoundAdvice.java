@@ -9,9 +9,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class StudentNotFoundAdvice {
 
-    @ExceptionHandler(StudentNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String studentNotFoundHandler(StudentNotFoundException studentNotFoundException) {
+    @ExceptionHandler(
+            StudentNotFoundException.class
+    )
+    @ResponseStatus(
+            HttpStatus.NOT_FOUND
+    )
+    public String studentNotFoundHandler(
+            StudentNotFoundException studentNotFoundException
+    ) {
         return studentNotFoundException.getMessage();
     }
 }

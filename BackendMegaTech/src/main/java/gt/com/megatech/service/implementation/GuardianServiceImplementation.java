@@ -27,7 +27,9 @@ public class GuardianServiceImplementation implements IGuardianService {
     private final IStudentRepository iStudentRepository;
     private final IEnrollmentRepository iEnrollmentRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
     public List<GuardianDTO> findAllGuardians() {
         return this.iGuardianRepository.findAll()
@@ -36,14 +38,20 @@ public class GuardianServiceImplementation implements IGuardianService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public Page<GuardianDTO> findAllGuardiansPaged(Pageable pageable) {
+    public Page<GuardianDTO> findAllGuardiansPaged(
+            Pageable pageable
+    ) {
         return this.iGuardianRepository.findAll(pageable)
                 .map(this::convertToGuardianDTOWithoutStudents);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
     public List<GuardianDTO> findAllGuardiansWithStudents() {
         return this.iGuardianRepository.findAllGuardiansWithStudents()
@@ -52,24 +60,36 @@ public class GuardianServiceImplementation implements IGuardianService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public Page<GuardianDTO> findAllGuardiansWithStudentsPaged(Pageable pageable) {
+    public Page<GuardianDTO> findAllGuardiansWithStudentsPaged(
+            Pageable pageable
+    ) {
         return this.iGuardianRepository.findAllGuardiansWithStudents(pageable)
                 .map(this::convertToGuardianDTO);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public GuardianDTO findByIdGuardian(Long id) {
+    public GuardianDTO findByIdGuardian(
+            Long id
+    ) {
         GuardianEntity guardianEntityExists = this.iGuardianRepository.findById(id)
                 .orElseThrow(() -> new GuardianNotFoundException(id));
         return this.convertToGuardianDTOWithoutStudents(guardianEntityExists);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public GuardianDTO findGuardianByIdWithStudents(Long id) {
+    public GuardianDTO findGuardianByIdWithStudents(
+            Long id
+    ) {
         GuardianEntity guardianEntityExists = this.iGuardianRepository.findGuardianByIdWithStudents(id)
                 .orElseThrow(() -> new GuardianNotFoundException(id));
         return this.convertToGuardianDTO(guardianEntityExists);
@@ -77,7 +97,9 @@ public class GuardianServiceImplementation implements IGuardianService {
 
     @Transactional
     @Override
-    public GuardianDTO saveGuardian(GuardianDTO guardianDTO) {
+    public GuardianDTO saveGuardian(
+            GuardianDTO guardianDTO
+    ) {
         if (iGuardianRepository.existsByName(guardianDTO.getName())) {
             throw new IllegalArgumentException("A guardian with this name already exists.");
         }
@@ -91,10 +113,14 @@ public class GuardianServiceImplementation implements IGuardianService {
 
     @Transactional
     @Override
-    public GuardianDTO updateGuardian(Long id, GuardianDTO guardianDTO) {
+    public GuardianDTO updateGuardian(
+            Long id,
+            GuardianDTO guardianDTO
+    ) {
         GuardianEntity guardianEntityExists = this.iGuardianRepository.findById(id)
                 .orElseThrow(() -> new GuardianNotFoundException(id));
         guardianEntityExists.setName(guardianDTO.getName());
+        guardianEntityExists.setDpi(guardianDTO.getDpi());
         guardianEntityExists.setPhone(guardianDTO.getPhone());
         guardianEntityExists.setAddress(guardianDTO.getAddress());
         GuardianEntity guardianEntityUpdated = this.iGuardianRepository.save(guardianEntityExists);
@@ -103,7 +129,9 @@ public class GuardianServiceImplementation implements IGuardianService {
 
     @Transactional
     @Override
-    public void deleteGuardian(Long id) {
+    public void deleteGuardian(
+            Long id
+    ) {
         GuardianEntity guardianEntity = this.iGuardianRepository.findById(id)
                 .orElseThrow(() -> new GuardianNotFoundException(id));
         guardianEntity.getStudentEntities().forEach(student -> {
@@ -117,46 +145,60 @@ public class GuardianServiceImplementation implements IGuardianService {
         this.iGuardianRepository.flush();
     }
 
-    private GuardianDTO convertToGuardianDTO(GuardianEntity guardianEntity) {
+    private GuardianDTO convertToGuardianDTO(
+            GuardianEntity guardianEntity
+    ) {
         return GuardianDTO.builder()
                 .id(guardianEntity.getId())
                 .name(guardianEntity.getName())
+                .dpi(guardianEntity.getDpi())
                 .phone(guardianEntity.getPhone())
                 .address(guardianEntity.getAddress())
                 .studentDTOS(guardianEntity.getStudentEntities().stream()
                         .map(studentEntity -> StudentDTO.builder()
                                 .id(studentEntity.getId())
                                 .name(studentEntity.getName())
+                                .cui(studentEntity.getCui())
+                                .personalCode(studentEntity.getPersonalCode())
                                 .birthDate(studentEntity.getBirthDate())
                                 .phone(studentEntity.getPhone())
                                 .email(studentEntity.getEmail())
                                 .address(studentEntity.getAddress())
-                                .educationLevelEnum(studentEntity.getEducationLevelEnum())
+                                .educationLevel(studentEntity.getEducationLevel())
+                                .academicStatusEnum(studentEntity.getAcademicStatusEnum())
                                 .build())
                         .collect(Collectors.toSet()))
                 .build();
     }
 
-    private GuardianEntity convertToGuardianEntity(GuardianDTO guardianDTO) {
+    private GuardianEntity convertToGuardianEntity(
+            GuardianDTO guardianDTO
+    ) {
         return GuardianEntity.builder()
                 .name(guardianDTO.getName())
+                .dpi(guardianDTO.getDpi())
                 .phone(guardianDTO.getPhone())
                 .address(guardianDTO.getAddress())
                 .studentEntities(guardianDTO.getStudentDTOS().stream()
                         .map(studentDTO -> StudentEntity.builder()
                                 .id(studentDTO.getId())
                                 .name(studentDTO.getName())
+                                .cui(studentDTO.getCui())
+                                .personalCode(studentDTO.getPersonalCode())
                                 .birthDate(studentDTO.getBirthDate())
                                 .phone(studentDTO.getPhone())
                                 .email(studentDTO.getEmail())
                                 .address(studentDTO.getAddress())
-                                .educationLevelEnum(studentDTO.getEducationLevelEnum())
+                                .educationLevel(studentDTO.getEducationLevel())
+                                .academicStatusEnum(studentDTO.getAcademicStatusEnum())
                                 .build())
                         .collect(Collectors.toSet()))
                 .build();
     }
 
-    private GuardianDTO convertToGuardianDTOWithoutStudents(GuardianEntity guardianEntity) {
+    private GuardianDTO convertToGuardianDTOWithoutStudents(
+            GuardianEntity guardianEntity
+    ) {
         return GuardianDTO.builder()
                 .id(guardianEntity.getId())
                 .name(guardianEntity.getName())

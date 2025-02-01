@@ -31,15 +31,25 @@ public class JwtTokenValidator extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String jwtToken = request.getHeader(
+                HttpHeaders.AUTHORIZATION
+        );
         if (jwtToken != null) {
             jwtToken = jwtToken.substring(7);
             DecodedJWT decodedJWT = jwtUtils.validatedToken(jwtToken);
             String username = jwtUtils.extractUsername(decodedJWT);
-            String stringAuthorities = jwtUtils.getSpecificClaim(decodedJWT, "authorities").asString();
-            Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(stringAuthorities);
+            String stringAuthorities = jwtUtils.getSpecificClaim(
+                    decodedJWT,
+                    "authorities"
+            ).asString();
+            Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(
+                    stringAuthorities
+            );
             SecurityContext securityContext = SecurityContextHolder.getContext();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    username,
+                    null,
+                    authorities);
             securityContext.setAuthentication(authentication);
             SecurityContextHolder.setContext(securityContext);
         }

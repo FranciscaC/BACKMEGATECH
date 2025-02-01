@@ -9,9 +9,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class EnrollmentNotFoundAdvice {
 
-    @ExceptionHandler(EnrollmentNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String enrollmentNotFoundHandler(EnrollmentNotFoundException enrollmentNotFoundException) {
+    @ExceptionHandler(
+            EnrollmentNotFoundException.class
+    )
+    @ResponseStatus(
+            HttpStatus.NOT_FOUND
+    )
+    public String enrollmentNotFoundHandler(
+            EnrollmentNotFoundException enrollmentNotFoundException
+    ) {
         return enrollmentNotFoundException.getMessage();
     }
 }

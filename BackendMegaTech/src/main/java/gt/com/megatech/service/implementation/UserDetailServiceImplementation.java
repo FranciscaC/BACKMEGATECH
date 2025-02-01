@@ -43,7 +43,9 @@ public class UserDetailServiceImplementation implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(
+            String username
+    ) throws UsernameNotFoundException {
         UserEntity userEntity = iUserRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("The user" + username + " " + DOES_NOT_EXIST));
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
@@ -65,7 +67,9 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         );
     }
 
-    public AuthResponseDTO loginUser(AuthLoginRequestDTO authLoginRequestDTO) {
+    public AuthResponseDTO loginUser(
+            AuthLoginRequestDTO authLoginRequestDTO
+    ) {
         String username = authLoginRequestDTO.username();
         String password = authLoginRequestDTO.password();
         Authentication authentication = this.authenticate(username, password);
@@ -79,7 +83,10 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         );
     }
 
-    public Authentication authenticate(String username, String password) {
+    public Authentication authenticate(
+            String username,
+            String password
+    ) {
         UserDetails userDetails = this.loadUserByUsername(username);
         if (userDetails == null) {
             throw new BadCredentialsException("Invalid username or password.");
@@ -94,7 +101,9 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         );
     }
 
-    public AuthResponseDTO createUser(AuthCreateUserRequestDTO authCreateUserRequestDTO) {
+    public AuthResponseDTO createUser(
+            AuthCreateUserRequestDTO authCreateUserRequestDTO
+    ) {
         String username = authCreateUserRequestDTO.username();
         String password = authCreateUserRequestDTO.password();
         List<String> roleRequest = authCreateUserRequestDTO.authCreateRoleRequestDTO().roleListName();
@@ -131,7 +140,10 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         );
     }
 
-    public AuthResponseDTO updateUser(String username, AuthCreateUserRequestDTO authCreateUserRequestDTO) {
+    public AuthResponseDTO updateUser(
+            String username,
+            AuthCreateUserRequestDTO authCreateUserRequestDTO
+    ) {
         UserEntity existingUser = iUserRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " " + DOES_NOT_EXIST));
         existingUser.setUsername(authCreateUserRequestDTO.username());
@@ -157,34 +169,49 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         );
     }
 
-    public void deleteUser(String username) {
+    public void deleteUser(
+            String username
+    ) {
         UserEntity existingUser = iUserRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " " + DOES_NOT_EXIST));
-        iUserRepository.delete(existingUser);
+        iUserRepository.delete(
+                existingUser
+        );
     }
 
     public List<UserEntity> findAllUsers() {
         return iUserRepository.findAll();
     }
 
-    public Page<UserEntity> findAllUsersPaged(Pageable pageable) {
+    public Page<UserEntity> findAllUsersPaged(
+            Pageable pageable
+    ) {
         return iUserRepository.findAll(pageable);
     }
 
-    public UserProfileResponseDTO getUserProfileFromToken(String token) {
+    public UserProfileResponseDTO getUserProfileFromToken(
+            String token
+    ) {
         String jwtToken = token.substring(7);
         DecodedJWT decodedJWT = jwtUtils.validatedToken(jwtToken);
         String username = decodedJWT.getSubject();
-        return this.getUserProfile(username);
+        return this.getUserProfile(
+                username
+        );
     }
 
-    public UserProfileResponseDTO getUserProfile(String username) {
+    public UserProfileResponseDTO getUserProfile(
+            String username
+    ) {
         UserEntity userEntity = iUserRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " does not exist."));
         List<String> roles = userEntity.getRoles()
                 .stream()
                 .map(roleEntity -> roleEntity.getRoleEnum().name())
                 .toList();
-        return new UserProfileResponseDTO(userEntity.getUsername(), roles);
+        return new UserProfileResponseDTO
+                (userEntity.getUsername(),
+                        roles
+                );
     }
 }

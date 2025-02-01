@@ -7,9 +7,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IProfessorRepository extends JpaRepository<ProfessorEntity, Long> {
 
-    boolean existsByName(String name);
+    boolean existsByName(
+            String name
+    );
 
-    boolean existsByPhone(String phone);
+    boolean existsByPhone(
+            String phone
+    );
 
-    boolean existsByEmail(String email);
+    boolean existsByEmail(
+            String email
+    );
 }

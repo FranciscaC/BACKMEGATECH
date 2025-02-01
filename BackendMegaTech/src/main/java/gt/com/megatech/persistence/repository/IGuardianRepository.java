@@ -14,16 +14,30 @@ import java.util.Optional;
 @Repository
 public interface IGuardianRepository extends JpaRepository<GuardianEntity, Long> {
 
-    @Query("SELECT DISTINCT g FROM GuardianEntity g JOIN FETCH g.studentEntities")
+    @Query(
+            "SELECT DISTINCT g FROM GuardianEntity g JOIN FETCH g.studentEntities"
+    )
     List<GuardianEntity> findAllGuardiansWithStudents();
 
-    @Query("SELECT DISTINCT g FROM GuardianEntity g JOIN FETCH g.studentEntities")
-    Page<GuardianEntity> findAllGuardiansWithStudents(Pageable pageable);
+    @Query(
+            "SELECT DISTINCT g FROM GuardianEntity g JOIN FETCH g.studentEntities"
+    )
+    Page<GuardianEntity> findAllGuardiansWithStudents(
+            Pageable pageable
+    );
 
-    @Query("SELECT DISTINCT g FROM GuardianEntity g JOIN FETCH g.studentEntities WHERE g.id = :id")
-    Optional<GuardianEntity> findGuardianByIdWithStudents(@Param("id") Long id);
+    @Query(
+            "SELECT DISTINCT g FROM GuardianEntity g JOIN FETCH g.studentEntities WHERE g.id = :id"
+    )
+    Optional<GuardianEntity> findGuardianByIdWithStudents(
+            @Param("id") Long id
+    );
 
-    boolean existsByName(String name);
+    boolean existsByName(
+            String name
+    );
 
-    boolean existsByPhone(String phone);
+    boolean existsByPhone(
+            String phone
+    );
 }

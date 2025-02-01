@@ -30,24 +30,41 @@ public class SecurityConfiguration {
     private final JwtUtils jwtUtils;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity httpSecurity
+    ) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class).build();
+                .sessionManagement(
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
+                .addFilterBefore(
+                        new JwtTokenValidator(jwtUtils),
+                        BasicAuthenticationFilter.class
+                ).build();
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration
+    ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    AuthenticationProvider authenticationProvider(UserDetailServiceImplementation userDetailServiceImplementation) {
+    AuthenticationProvider authenticationProvider(
+            UserDetailServiceImplementation userDetailServiceImplementation
+    ) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        authenticationProvider.setUserDetailsService(userDetailServiceImplementation);
+        authenticationProvider.setPasswordEncoder(
+                passwordEncoder()
+        );
+        authenticationProvider.setUserDetailsService(
+                userDetailServiceImplementation
+        );
         return authenticationProvider;
     }
 

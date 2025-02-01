@@ -10,13 +10,24 @@ public interface IProfessorService {
 
     List<ProfessorDTO> findAllProfessors();
 
-    Page<ProfessorDTO> findAllProfessorsPaged(Pageable pageable);
+    Page<ProfessorDTO> findAllProfessorsPaged(
+            Pageable pageable
+    );
 
-    ProfessorDTO findByIdProfessor(Long id);
+    ProfessorDTO findByIdProfessor(
+            Long id
+    );
 
-    ProfessorDTO saveProfessor(ProfessorDTO professorDTO);
+    ProfessorDTO saveProfessor(
+            ProfessorDTO professorDTO
+    );
 
-    ProfessorDTO updateProfessor(Long id, ProfessorDTO professorDTO);
+    ProfessorDTO updateProfessor(
+            Long id,
+            ProfessorDTO professorDTO
+    );
 
-    void deleteProfessor(Long id);
+    void deleteProfessor(
+            Long id
+    );
 }

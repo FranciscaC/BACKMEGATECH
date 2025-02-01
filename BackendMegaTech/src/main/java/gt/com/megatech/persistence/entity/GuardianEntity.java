@@ -15,7 +15,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "guardians")
+@Table(
+        name = "guardians"
+)
 public class GuardianEntity {
 
     @Id
@@ -44,6 +46,25 @@ public class GuardianEntity {
             unique = true
     )
     private String name;
+
+    @NotBlank(
+            message = "The dpi must not be empty"
+    )
+    @Size(
+            min = 13,
+            max = 13,
+            message = "The dpi must be exactly 13 characters long."
+    )
+    @Pattern(
+            regexp = "\\d{13}",
+            message = "The dpi must contain exactly 13 numeric digits without spaces or separators."
+    )
+    @Column(
+            length = 13,
+            nullable = false,
+            unique = true
+    )
+    private String dpi;
 
     @NotBlank(
             message = "The phone must not be empty"

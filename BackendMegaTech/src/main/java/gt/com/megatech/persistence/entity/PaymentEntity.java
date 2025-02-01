@@ -14,7 +14,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "payments")
+@Table(
+        name = "payments"
+)
 public class PaymentEntity {
 
     @Id
@@ -122,11 +124,11 @@ public class PaymentEntity {
             message = "Student cannot be null"
     )
     @ManyToOne(
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     @JoinColumn(
             name = "student_id",
             updatable = false
     )
-    private StudentEntity student;
+    private StudentEntity studentEntity;
 }

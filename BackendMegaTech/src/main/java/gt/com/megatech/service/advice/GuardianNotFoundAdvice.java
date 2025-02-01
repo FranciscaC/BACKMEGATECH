@@ -9,9 +9,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GuardianNotFoundAdvice {
 
-    @ExceptionHandler(GuardianNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String guardianNotFoundHandler(GuardianNotFoundException guardianNotFoundException) {
+    @ExceptionHandler(
+            GuardianNotFoundException.class
+    )
+    @ResponseStatus(
+            HttpStatus.NOT_FOUND
+    )
+    public String guardianNotFoundHandler(
+            GuardianNotFoundException guardianNotFoundException
+    ) {
         return guardianNotFoundException.getMessage();
     }
 }

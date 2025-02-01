@@ -24,16 +24,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api/guardian")
+@RequestMapping(
+        "/api/guardian"
+)
 @RequiredArgsConstructor
-@PreAuthorize("denyAll()")
+@PreAuthorize(
+        "denyAll()"
+)
 public class GuardianController {
 
     private final GuardianModelAssembler guardianModelAssembler;
     private final PagedResourcesAssembler<GuardianDTO> guardianDTOPagedResourcesAssembler;
     private final IGuardianService iGuardianService;
 
-    @PreAuthorize("hasAuthority('READ')")
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
     @GetMapping
     public CollectionModel<EntityModel<GuardianDTO>> findAllGuardians() {
         List<EntityModel<GuardianDTO>> guardians = this.iGuardianService.findAllGuardians()
@@ -42,28 +48,46 @@ public class GuardianController {
                 .toList();
         return CollectionModel.of(
                 guardians,
-                linkTo(methodOn(GuardianController.class).findAllGuardians()).withSelfRel()
+                linkTo(methodOn(GuardianController.class).findAllGuardians())
+                        .withSelfRel()
         );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
-    @GetMapping("/paged")
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/paged"
+    )
     public ResponseEntity<PagedModel<EntityModel<GuardianDTO>>> findAllGuardiansPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable
     ) {
-        Pageable customPageable = PageRequest.of(page, size, pageable.getSort());
-        Page<GuardianDTO> guardianDTOPage = this.iGuardianService.findAllGuardiansPaged(customPageable);
-        PagedModel<EntityModel<GuardianDTO>> entityModelPagedModel = guardianDTOPagedResourcesAssembler.toModel(
-                guardianDTOPage,
-                guardianModelAssembler
+        Pageable customPageable = PageRequest.of(
+                page,
+                size,
+                pageable.getSort()
         );
-        return ResponseEntity.ok(entityModelPagedModel);
+        Page<GuardianDTO> guardianDTOPage = this.iGuardianService.findAllGuardiansPaged(
+                customPageable
+        );
+        PagedModel<EntityModel<GuardianDTO>> entityModelPagedModel = guardianDTOPagedResourcesAssembler
+                .toModel(
+                        guardianDTOPage,
+                        guardianModelAssembler
+                );
+        return ResponseEntity.ok(
+                entityModelPagedModel
+        );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
-    @GetMapping("/with-students")
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/with-students"
+    )
     public CollectionModel<EntityModel<GuardianDTO>> findAllGuardiansWithStudents() {
         List<EntityModel<GuardianDTO>> guardians = this.iGuardianService.findAllGuardiansWithStudents()
                 .stream()
@@ -71,64 +95,130 @@ public class GuardianController {
                 .toList();
         return CollectionModel.of(
                 guardians,
-                linkTo(methodOn(GuardianController.class).findAllGuardiansWithStudents()).withSelfRel()
+                linkTo(methodOn(GuardianController.class).findAllGuardiansWithStudents())
+                        .withSelfRel()
         );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
-    @GetMapping("/paged-with-students")
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/paged-with-students"
+    )
     public ResponseEntity<PagedModel<EntityModel<GuardianDTO>>> findAllGuardiansWithStudentsPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable
     ) {
-        Pageable customPageable = PageRequest.of(page, size, pageable.getSort());
-        Page<GuardianDTO> guardianDTOPage = this.iGuardianService.findAllGuardiansWithStudentsPaged(customPageable);
-        PagedModel<EntityModel<GuardianDTO>> entityModelPagedModel = guardianDTOPagedResourcesAssembler.toModel(
-                guardianDTOPage,
-                guardianModelAssembler
+        Pageable customPageable = PageRequest.of(
+                page,
+                size,
+                pageable.getSort()
         );
-        return ResponseEntity.ok(entityModelPagedModel);
+        Page<GuardianDTO> guardianDTOPage = this.iGuardianService.findAllGuardiansWithStudentsPaged(
+                customPageable
+        );
+        PagedModel<EntityModel<GuardianDTO>> entityModelPagedModel = guardianDTOPagedResourcesAssembler
+                .toModel(
+                        guardianDTOPage,
+                        guardianModelAssembler
+                );
+        return ResponseEntity.ok(
+                entityModelPagedModel
+        );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
-    @GetMapping("/{id}")
-    public EntityModel<GuardianDTO> findGuardianById(@PathVariable Long id) {
-        GuardianDTO guardian = this.iGuardianService.findByIdGuardian(id);
-        return guardianModelAssembler.toModel(guardian);
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/{id}"
+    )
+    public EntityModel<GuardianDTO> findGuardianById(
+            @PathVariable Long id
+    ) {
+        GuardianDTO guardian = this.iGuardianService.findByIdGuardian(
+                id
+        );
+        return guardianModelAssembler
+                .toModel(
+                        guardian
+                );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
-    @GetMapping("/{id}/with-students")
-    public EntityModel<GuardianDTO> findGuardianByIdWithStudents(@PathVariable Long id) {
-        GuardianDTO guardian = this.iGuardianService.findGuardianByIdWithStudents(id);
-        return guardianModelAssembler.toModel(guardian);
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/{id}/with-students"
+    )
+    public EntityModel<GuardianDTO> findGuardianByIdWithStudents(
+            @PathVariable Long id
+    ) {
+        GuardianDTO guardian = this.iGuardianService.findGuardianByIdWithStudents(
+                id
+        );
+        return guardianModelAssembler
+                .toModel(
+                        guardian
+                );
     }
 
-    @PreAuthorize("hasAuthority('CREATE')")
+    @PreAuthorize(
+            "hasAuthority('CREATE')"
+    )
     @PostMapping
-    public ResponseEntity<EntityModel<GuardianDTO>> saveGuardian(@RequestBody @Valid GuardianDTO guardianDTO) {
+    public ResponseEntity<EntityModel<GuardianDTO>> saveGuardian(
+            @RequestBody @Valid GuardianDTO guardianDTO
+    ) {
         EntityModel<GuardianDTO> guardianDTOEntityModel = guardianModelAssembler
-                .toModel(this.iGuardianService.saveGuardian(guardianDTO));
+                .toModel(this.iGuardianService.saveGuardian(
+                        guardianDTO)
+                );
         return ResponseEntity
-                .created(guardianDTOEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(guardianDTOEntityModel);
+                .created(guardianDTOEntityModel.getRequiredLink(
+                                IanaLinkRelations.SELF
+                        )
+                        .toUri()).body(guardianDTOEntityModel);
     }
 
-    @PreAuthorize("hasAuthority('UPDATE')")
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<GuardianDTO>> updateGuardian(@PathVariable Long id, @RequestBody @Valid GuardianDTO guardianDTO) {
+    @PreAuthorize(
+            "hasAuthority('UPDATE')"
+    )
+    @PutMapping(
+            "/{id}"
+    )
+    public ResponseEntity<EntityModel<GuardianDTO>> updateGuardian(
+            @PathVariable Long id,
+            @RequestBody @Valid GuardianDTO guardianDTO
+    ) {
         EntityModel<GuardianDTO> guardianDTOEntityModel = guardianModelAssembler
-                .toModel(this.iGuardianService.updateGuardian(id, guardianDTO));
+                .toModel(this.iGuardianService.updateGuardian(
+                        id,
+                        guardianDTO
+                ));
         return ResponseEntity
-                .created(guardianDTOEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(guardianDTOEntityModel);
+                .created(guardianDTOEntityModel.getRequiredLink(
+                                IanaLinkRelations.SELF
+                        )
+                        .toUri()).body(guardianDTOEntityModel);
     }
 
-    @PreAuthorize("hasAuthority('DELETE')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGuardian(@PathVariable Long id) {
-        this.iGuardianService.deleteGuardian(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @PreAuthorize(
+            "hasAuthority('DELETE')"
+    )
+    @DeleteMapping(
+            "/{id}"
+    )
+    public ResponseEntity<Void> deleteGuardian(
+            @PathVariable Long id
+    ) {
+        this.iGuardianService.deleteGuardian(
+                id
+        );
+        return new ResponseEntity<>(
+                HttpStatus.NO_CONTENT
+        );
     }
 }

@@ -13,7 +13,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "professors")
+@Table(
+        name = "professors"
+)
 public class ProfessorEntity {
 
     @Id

@@ -19,7 +19,9 @@ public class ProfessorServiceImplementation implements IProfessorService {
 
     private final IProfessorRepository iProfessorRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
     public List<ProfessorDTO> findAllProfessors() {
         return this.iProfessorRepository.findAll()
@@ -28,16 +30,24 @@ public class ProfessorServiceImplementation implements IProfessorService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public Page<ProfessorDTO> findAllProfessorsPaged(Pageable pageable) {
+    public Page<ProfessorDTO> findAllProfessorsPaged(
+            Pageable pageable
+    ) {
         return this.iProfessorRepository.findAll(pageable)
                 .map(this::convertToProfessorDTO);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public ProfessorDTO findByIdProfessor(Long id) {
+    public ProfessorDTO findByIdProfessor(
+            Long id
+    ) {
         ProfessorEntity professorEntityExists = this.iProfessorRepository.findById(id)
                 .orElseThrow(() -> new ProfessorNotFoundException(id));
         return this.convertToProfessorDTO(professorEntityExists);
@@ -45,7 +55,9 @@ public class ProfessorServiceImplementation implements IProfessorService {
 
     @Transactional
     @Override
-    public ProfessorDTO saveProfessor(ProfessorDTO professorDTO) {
+    public ProfessorDTO saveProfessor(
+            ProfessorDTO professorDTO
+    ) {
         if (this.iProfessorRepository.existsByName(professorDTO.getName())) {
             throw new IllegalArgumentException("A professor with this name already exists.");
         }
@@ -62,7 +74,10 @@ public class ProfessorServiceImplementation implements IProfessorService {
 
     @Transactional
     @Override
-    public ProfessorDTO updateProfessor(Long id, ProfessorDTO professorDTO) {
+    public ProfessorDTO updateProfessor(
+            Long id,
+            ProfessorDTO professorDTO
+    ) {
         ProfessorEntity professorEntityExists = this.iProfessorRepository.findById(id)
                 .orElseThrow(() -> new ProfessorNotFoundException(id));
         professorEntityExists.setName(professorDTO.getName());
@@ -75,13 +90,17 @@ public class ProfessorServiceImplementation implements IProfessorService {
 
     @Transactional
     @Override
-    public void deleteProfessor(Long id) {
+    public void deleteProfessor(
+            Long id
+    ) {
         ProfessorEntity professorEntity = this.iProfessorRepository.findById(id)
                 .orElseThrow(() -> new ProfessorNotFoundException(id));
         this.iProfessorRepository.delete(professorEntity);
     }
 
-    private ProfessorDTO convertToProfessorDTO(ProfessorEntity professorEntity) {
+    private ProfessorDTO convertToProfessorDTO(
+            ProfessorEntity professorEntity
+    ) {
         return ProfessorDTO.builder()
                 .id(professorEntity.getId())
                 .name(professorEntity.getName())
@@ -91,7 +110,9 @@ public class ProfessorServiceImplementation implements IProfessorService {
                 .build();
     }
 
-    private ProfessorEntity convertToProfessorEntity(ProfessorDTO professorDTO) {
+    private ProfessorEntity convertToProfessorEntity(
+            ProfessorDTO professorDTO
+    ) {
         return ProfessorEntity.builder()
                 .name(professorDTO.getName())
                 .phone(professorDTO.getPhone())

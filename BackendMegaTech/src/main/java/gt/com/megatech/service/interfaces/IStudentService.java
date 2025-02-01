@@ -1,6 +1,5 @@
 package gt.com.megatech.service.interfaces;
 
-import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
 import gt.com.megatech.presentation.dto.StudentDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,19 +10,48 @@ public interface IStudentService {
 
     List<StudentDTO> findAllStudyingStudents();
 
+    List<StudentDTO> findAllSuspendedStudents();
+
     List<StudentDTO> findAllGraduatedStudents();
 
-    Page<StudentDTO> findAllStudyingStudentsPaged(Pageable pageable);
+    Page<StudentDTO> findAllStudyingStudentsPaged(
+            Pageable pageable
+    );
 
-    Page<StudentDTO> findAllGraduatedStudentsPaged(Pageable pageable);
+    Page<StudentDTO> findAllSuspendedStudentsPaged(
+            Pageable pageable
+    );
 
-    StudentDTO findByIdStudent(Long id);
+    Page<StudentDTO> findAllGraduatedStudentsPaged(
+            Pageable pageable
+    );
 
-    StudentDTO saveStudent(StudentDTO studentDTO);
+    StudentDTO findByIdStudent(
+            Long id
+    );
 
-    StudentDTO updateStudent(Long id, StudentDTO studentDTO);
+    StudentDTO saveStudent(
+            StudentDTO studentDTO
+    );
 
-    StudentDTO updateAcademicStatusToGraduated(Long id);
+    StudentDTO updateStudent(
+            Long id,
+            StudentDTO studentDTO
+    );
 
-    void deleteStudent(Long id);
+    StudentDTO updateAcademicStatusToStudying(
+            Long id
+    );
+
+    StudentDTO updateAcademicStatusToSuspended(
+            Long id
+    );
+
+    StudentDTO updateAcademicStatusToGraduated(
+            Long id
+    );
+
+    void deleteStudent(
+            Long id
+    );
 }

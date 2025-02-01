@@ -2,7 +2,6 @@ package gt.com.megatech.presentation.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
-import gt.com.megatech.persistence.entity.enums.EducationLevelEnum;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,16 +11,20 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(
+        JsonInclude.Include.NON_EMPTY
+)
 public class StudentDTO {
 
     private Long id;
     private String name;
+    private String cui;
+    private String personalCode;
     private LocalDate birthDate;
     private String phone;
     private String email;
     private String address;
-    private EducationLevelEnum educationLevelEnum;
+    private String educationLevel;
     private AcademicStatusEnum academicStatusEnum;
     private GuardianDTO guardianDTO;
 }

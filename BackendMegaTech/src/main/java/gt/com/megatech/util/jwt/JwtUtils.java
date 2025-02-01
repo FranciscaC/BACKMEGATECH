@@ -23,7 +23,9 @@ public class JwtUtils {
     @Value("${security.jwt.secret.user}")
     private String secretUser;
 
-    public String createToken(Authentication authentication) {
+    public String createToken(
+            Authentication authentication
+    ) {
         Algorithm algorithm = Algorithm.HMAC256(this.secretKey);
         String username = authentication.getPrincipal().toString();
         String authorities = authentication
@@ -37,13 +39,15 @@ public class JwtUtils {
                 .withSubject(username)
                 .withClaim("authorities", authorities)
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 7200000))
                 .withJWTId(UUID.randomUUID().toString())
                 .withNotBefore(new Date(System.currentTimeMillis()))
                 .sign(algorithm);
     }
 
-    public DecodedJWT validatedToken(String token) {
+    public DecodedJWT validatedToken(
+            String token
+    ) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(this.secretKey);
             JWTVerifier jwtVerifier = JWT
@@ -56,11 +60,16 @@ public class JwtUtils {
         }
     }
 
-    public String extractUsername(DecodedJWT decodedJWT) {
+    public String extractUsername(
+            DecodedJWT decodedJWT
+    ) {
         return decodedJWT.getSubject();
     }
 
-    public Claim getSpecificClaim(DecodedJWT decodedJWT, String claimName) {
+    public Claim getSpecificClaim(
+            DecodedJWT decodedJWT,
+            String claimName
+    ) {
         return decodedJWT.getClaim(claimName);
     }
 }

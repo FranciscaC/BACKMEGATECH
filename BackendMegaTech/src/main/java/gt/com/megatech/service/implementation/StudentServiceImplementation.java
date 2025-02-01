@@ -1,8 +1,11 @@
 package gt.com.megatech.service.implementation;
 
+import gt.com.megatech.persistence.entity.GraduatedStudentEntity;
 import gt.com.megatech.persistence.entity.GuardianEntity;
 import gt.com.megatech.persistence.entity.StudentEntity;
 import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
+import gt.com.megatech.persistence.entity.enums.MonthEnum;
+import gt.com.megatech.persistence.repository.IGraduatedStudentRepository;
 import gt.com.megatech.persistence.repository.IGuardianRepository;
 import gt.com.megatech.persistence.repository.IStudentRepository;
 import gt.com.megatech.presentation.dto.GuardianDTO;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,42 +28,92 @@ public class StudentServiceImplementation implements IStudentService {
 
     private final IGuardianRepository iGuardianRepository;
     private final IStudentRepository iStudentRepository;
+    private final IGraduatedStudentRepository iGraduatedStudentRepository;
 
-    @Transactional(readOnly = true)
+    private static final String UPDATED_ILLEGAL_STATE_EXCEPTION = "Failed to update academic status.";
+
+    @Transactional(
+            readOnly = true
+    )
     @Override
     public List<StudentDTO> findAllStudyingStudents() {
-        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.STUDYING)
-                .stream()
+        return this.iStudentRepository.findByAcademicStatusEnum(
+                        AcademicStatusEnum.STUDYING
+                ).stream()
                 .map(this::convertToStudentDTO)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
+    @Override
+    public List<StudentDTO> findAllSuspendedStudents() {
+        return this.iStudentRepository.findByAcademicStatusEnum(
+                        AcademicStatusEnum.SUSPENDED
+                ).stream()
+                .map(this::convertToStudentDTO)
+                .toList();
+    }
+
+    @Transactional(
+            readOnly = true
+    )
     @Override
     public List<StudentDTO> findAllGraduatedStudents() {
-        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.GRADUATED)
-                .stream()
+        return this.iStudentRepository.findByAcademicStatusEnum(
+                        AcademicStatusEnum.GRADUATED
+                ).stream()
                 .map(this::convertToStudentDTO)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public Page<StudentDTO> findAllStudyingStudentsPaged(Pageable pageable) {
-        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.STUDYING, pageable)
-                .map(this::convertToStudentDTO);
+    public Page<StudentDTO> findAllStudyingStudentsPaged(
+            Pageable pageable
+    ) {
+        return this.iStudentRepository.findByAcademicStatusEnum(
+                AcademicStatusEnum.STUDYING,
+                pageable
+        ).map(this::convertToStudentDTO);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public Page<StudentDTO> findAllGraduatedStudentsPaged(Pageable pageable) {
-        return this.iStudentRepository.findByAcademicStatusEnum(AcademicStatusEnum.GRADUATED, pageable)
-                .map(this::convertToStudentDTO);
+    public Page<StudentDTO> findAllSuspendedStudentsPaged(
+            Pageable pageable
+    ) {
+        return this.iStudentRepository.findByAcademicStatusEnum(
+                AcademicStatusEnum.SUSPENDED,
+                pageable
+        ).map(this::convertToStudentDTO);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public StudentDTO findByIdStudent(Long id) {
+    public Page<StudentDTO> findAllGraduatedStudentsPaged(
+            Pageable pageable
+    ) {
+        return this.iStudentRepository.findByAcademicStatusEnum(
+                AcademicStatusEnum.GRADUATED,
+                pageable
+        ).map(this::convertToStudentDTO);
+    }
+
+    @Transactional(
+            readOnly = true
+    )
+    @Override
+    public StudentDTO findByIdStudent(
+            Long id
+    ) {
         StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
         return this.convertToStudentDTO(studentEntityExists);
@@ -67,7 +121,9 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional
     @Override
-    public StudentDTO saveStudent(StudentDTO studentDTO) {
+    public StudentDTO saveStudent(
+            StudentDTO studentDTO
+    ) {
         if (iStudentRepository.existsByName(studentDTO.getName())) {
             throw new IllegalArgumentException("A student with this name already exists.");
         }
@@ -81,11 +137,13 @@ public class StudentServiceImplementation implements IStudentService {
                 .orElseThrow(() -> new GuardianNotFoundException(studentDTO.getGuardianDTO().getId()));
         StudentEntity studentEntity = this.convertToStudentEntity(studentDTO);
         studentEntity.setName(studentDTO.getName());
+        studentEntity.setCui(studentDTO.getCui());
+        studentEntity.setPersonalCode(studentDTO.getPersonalCode());
         studentEntity.setBirthDate(studentDTO.getBirthDate());
         studentEntity.setPhone(studentDTO.getPhone());
         studentEntity.setEmail(studentDTO.getEmail());
         studentEntity.setAddress(studentDTO.getAddress());
-        studentEntity.setEducationLevelEnum(studentDTO.getEducationLevelEnum());
+        studentEntity.setEducationLevel(studentDTO.getEducationLevel());
         studentEntity.setAcademicStatusEnum(AcademicStatusEnum.STUDYING);
         studentEntity.setGuardianEntity(guardianEntityExists);
         StudentEntity studentEntitySaved = this.iStudentRepository.save(studentEntity);
@@ -94,15 +152,20 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional
     @Override
-    public StudentDTO updateStudent(Long id, StudentDTO studentDTO) {
+    public StudentDTO updateStudent(
+            Long id,
+            StudentDTO studentDTO
+    ) {
         StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
         studentEntityExists.setName(studentDTO.getName());
+        studentEntityExists.setCui(studentDTO.getCui());
+        studentEntityExists.setPersonalCode(studentDTO.getPersonalCode());
         studentEntityExists.setBirthDate(studentDTO.getBirthDate());
         studentEntityExists.setPhone(studentDTO.getPhone());
         studentEntityExists.setEmail(studentDTO.getEmail());
         studentEntityExists.setAddress(studentDTO.getAddress());
-        studentEntityExists.setEducationLevelEnum(studentDTO.getEducationLevelEnum());
+        studentEntityExists.setEducationLevel(studentDTO.getEducationLevel());
         studentEntityExists.setAcademicStatusEnum(studentDTO.getAcademicStatusEnum());
         StudentEntity studentUpdated = this.iStudentRepository.save(studentEntityExists);
         return convertToStudentDTO(studentUpdated);
@@ -110,13 +173,18 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional
     @Override
-    public StudentDTO updateAcademicStatusToGraduated(Long id) {
+    public StudentDTO updateAcademicStatusToStudying(
+            Long id
+    ) {
         if (!this.iStudentRepository.existsById(id)) {
             throw new StudentNotFoundException(id);
         }
-        int rowsUpdated = this.iStudentRepository.updateAcademicStatusById(id, AcademicStatusEnum.GRADUATED);
+        int rowsUpdated = this.iStudentRepository.updateAcademicStatusById(
+                id,
+                AcademicStatusEnum.STUDYING
+        );
         if (rowsUpdated == 0) {
-            throw new IllegalStateException("No se pudo actualizar el estado académico.");
+            throw new IllegalStateException(UPDATED_ILLEGAL_STATE_EXCEPTION);
         }
         StudentEntity updatedStudent = this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
@@ -125,39 +193,100 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional
     @Override
-    public void deleteStudent(Long id) {
+    public StudentDTO updateAcademicStatusToSuspended(
+            Long id
+    ) {
+        if (!this.iStudentRepository.existsById(id)) {
+            throw new StudentNotFoundException(id);
+        }
+        int rowsUpdated = this.iStudentRepository.updateAcademicStatusById(
+                id,
+                AcademicStatusEnum.SUSPENDED
+        );
+        if (rowsUpdated == 0) {
+            throw new IllegalStateException(UPDATED_ILLEGAL_STATE_EXCEPTION);
+        }
+        StudentEntity updatedStudent = this.iStudentRepository.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id));
+        return convertToStudentDTO(updatedStudent);
+    }
+
+    @Transactional
+    @Override
+    public StudentDTO updateAcademicStatusToGraduated(
+            Long id
+    ) {
+        if (!this.iStudentRepository.existsById(id)) {
+            throw new StudentNotFoundException(id);
+        }
+        int rowsUpdated = this.iStudentRepository.updateAcademicStatusById(
+                id,
+                AcademicStatusEnum.GRADUATED
+        );
+        if (rowsUpdated == 0) {
+            throw new IllegalStateException(UPDATED_ILLEGAL_STATE_EXCEPTION);
+        }
+        StudentEntity updatedStudent = this.iStudentRepository.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id));
+        LocalDate localDate = LocalDate.now();
+        MonthEnum monthEnum = MonthEnum.fromJavaMonth(localDate.getMonth());
+        GraduatedStudentEntity graduatedStudentEntity = GraduatedStudentEntity.builder()
+                .graduationMonth(monthEnum)
+                .graduationYear(localDate.getYear())
+                .graduationDate(localDate)
+                .studentEntity(updatedStudent)
+                .build();
+        this.iGraduatedStudentRepository.save(graduatedStudentEntity);
+        return convertToStudentDTO(updatedStudent);
+    }
+
+    @Transactional
+    @Override
+    public void deleteStudent(
+            Long id
+    ) {
         StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
         this.iStudentRepository.delete(studentEntityExists);
     }
 
-    private StudentDTO convertToStudentDTO(StudentEntity studentEntity) {
+    private StudentDTO convertToStudentDTO(
+            StudentEntity studentEntity
+    ) {
         return StudentDTO.builder()
                 .id(studentEntity.getId())
                 .name(studentEntity.getName())
+                .cui(studentEntity.getCui())
+                .personalCode(studentEntity.getPersonalCode())
                 .birthDate(studentEntity.getBirthDate())
                 .phone(studentEntity.getPhone())
                 .email(studentEntity.getEmail())
                 .address(studentEntity.getAddress())
-                .educationLevelEnum(studentEntity.getEducationLevelEnum())
+                .educationLevel(studentEntity.getEducationLevel())
                 .academicStatusEnum(studentEntity.getAcademicStatusEnum())
                 .guardianDTO(convertToGuardianDTO(studentEntity.getGuardianEntity()))
                 .build();
     }
 
-    private StudentEntity convertToStudentEntity(StudentDTO studentDTO) {
+    private StudentEntity convertToStudentEntity(
+            StudentDTO studentDTO
+    ) {
         return StudentEntity.builder()
                 .name(studentDTO.getName())
+                .cui(studentDTO.getCui())
+                .personalCode(studentDTO.getPersonalCode())
                 .birthDate(studentDTO.getBirthDate())
                 .phone(studentDTO.getPhone())
                 .email(studentDTO.getEmail())
                 .address(studentDTO.getAddress())
-                .educationLevelEnum(studentDTO.getEducationLevelEnum())
+                .educationLevel(studentDTO.getEducationLevel())
                 .academicStatusEnum(studentDTO.getAcademicStatusEnum())
                 .build();
     }
 
-    private GuardianDTO convertToGuardianDTO(GuardianEntity guardianEntity) {
+    private GuardianDTO convertToGuardianDTO(
+            GuardianEntity guardianEntity
+    ) {
         return GuardianDTO.builder()
                 .id(guardianEntity.getId())
                 .name(guardianEntity.getName())

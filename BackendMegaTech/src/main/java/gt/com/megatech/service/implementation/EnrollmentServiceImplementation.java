@@ -24,7 +24,9 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
     private final IEnrollmentRepository iEnrollmentRepository;
     private final IStudentRepository iStudentRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
     public List<EnrollmentDTO> findAllEnrollments() {
         return this.iEnrollmentRepository.findAll()
@@ -33,16 +35,24 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public Page<EnrollmentDTO> findAllEnrollmentsPaged(Pageable pageable) {
+    public Page<EnrollmentDTO> findAllEnrollmentsPaged(
+            Pageable pageable
+    ) {
         return this.iEnrollmentRepository.findAll(pageable)
                 .map(this::convertToEnrollmentDTO);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(
+            readOnly = true
+    )
     @Override
-    public EnrollmentDTO findByIdEnrollment(Long id) {
+    public EnrollmentDTO findByIdEnrollment(
+            Long id
+    ) {
         EnrollmentEntity enrollmentEntity = this.iEnrollmentRepository.findById(id)
                 .orElseThrow(() -> new EnrollmentNotFoundException(id));
         return this.convertToEnrollmentDTO(enrollmentEntity);
@@ -50,9 +60,14 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
 
     @Transactional
     @Override
-    public EnrollmentDTO saveEnrollment(EnrollmentDTO enrollmentDTO) {
-        StudentEntity studentEntityExists = this.iStudentRepository.findById(enrollmentDTO.getStudentDTO().getId())
-                .orElseThrow(() -> new StudentNotFoundException(enrollmentDTO.getStudentDTO().getId()));
+    public EnrollmentDTO saveEnrollment(
+            EnrollmentDTO enrollmentDTO
+    ) {
+        StudentEntity studentEntityExists = this.iStudentRepository.findById(
+                enrollmentDTO.getStudentDTO().getId()
+        ).orElseThrow(() -> new StudentNotFoundException(
+                enrollmentDTO.getStudentDTO().getId())
+        );
         EnrollmentEntity enrollmentEntity = this.convertToEnrollmentEntity(enrollmentDTO);
         enrollmentEntity.setStudentEntity(studentEntityExists);
         EnrollmentEntity enrollmentEntitySaved = this.iEnrollmentRepository.save(enrollmentEntity);
@@ -61,7 +76,10 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
 
     @Transactional
     @Override
-    public EnrollmentDTO updateEnrollment(Long id, EnrollmentDTO enrollmentDTO) {
+    public EnrollmentDTO updateEnrollment(
+            Long id,
+            EnrollmentDTO enrollmentDTO
+    ) {
         EnrollmentEntity enrollmentEntityExists = this.iEnrollmentRepository.findById(id)
                 .orElseThrow(() -> new EnrollmentNotFoundException(id));
         enrollmentEntityExists.setEnrollmentDate(enrollmentDTO.getEnrollmentDate());
@@ -72,13 +90,17 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
 
     @Transactional
     @Override
-    public void deleteEnrollment(Long id) {
+    public void deleteEnrollment(
+            Long id
+    ) {
         EnrollmentEntity enrollmentEntity = this.iEnrollmentRepository.findById(id)
                 .orElseThrow(() -> new EnrollmentNotFoundException(id));
         this.iEnrollmentRepository.delete(enrollmentEntity);
     }
 
-    private EnrollmentDTO convertToEnrollmentDTO(EnrollmentEntity enrollmentEntity) {
+    private EnrollmentDTO convertToEnrollmentDTO(
+            EnrollmentEntity enrollmentEntity
+    ) {
         return EnrollmentDTO.builder()
                 .id(enrollmentEntity.getId())
                 .enrollmentDate(enrollmentEntity.getEnrollmentDate())
@@ -87,22 +109,28 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
                 .build();
     }
 
-    private EnrollmentEntity convertToEnrollmentEntity(EnrollmentDTO enrollmentDTO) {
+    private EnrollmentEntity convertToEnrollmentEntity(
+            EnrollmentDTO enrollmentDTO
+    ) {
         return EnrollmentEntity.builder()
                 .enrollmentDate(enrollmentDTO.getEnrollmentDate())
                 .paymentAmount(enrollmentDTO.getPaymentAmount())
                 .build();
     }
 
-    private StudentDTO convertToStudentDTO(StudentEntity studentEntity) {
+    private StudentDTO convertToStudentDTO(
+            StudentEntity studentEntity
+    ) {
         return StudentDTO.builder()
                 .id(studentEntity.getId())
                 .name(studentEntity.getName())
+                .cui(studentEntity.getCui())
+                .personalCode(studentEntity.getPersonalCode())
                 .birthDate(studentEntity.getBirthDate())
                 .phone(studentEntity.getPhone())
                 .email(studentEntity.getEmail())
                 .address(studentEntity.getAddress())
-                .educationLevelEnum(studentEntity.getEducationLevelEnum())
+                .educationLevel(studentEntity.getEducationLevel())
                 .build();
     }
 }

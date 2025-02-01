@@ -9,21 +9,39 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleRuntimeException(RuntimeException ex) {
+    @ExceptionHandler(
+            RuntimeException.class
+    )
+    @ResponseStatus(
+            HttpStatus.BAD_REQUEST
+    )
+    public String handleRuntimeException(
+            RuntimeException ex
+    ) {
         return ex.getMessage();
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+    @ExceptionHandler(
+            DataIntegrityViolationException.class
+    )
+    @ResponseStatus(
+            HttpStatus.CONFLICT
+    )
+    public String handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex
+    ) {
         return "A database constraint was violated: " + ex.getMostSpecificCause().getMessage();
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleGenericException(Exception ex) {
+    @ExceptionHandler(
+            Exception.class
+    )
+    @ResponseStatus(
+            HttpStatus.INTERNAL_SERVER_ERROR
+    )
+    public String handleGenericException(
+            Exception ex
+    ) {
         return "An unexpected error occurred: " + ex.getMessage();
     }
 }

@@ -10,13 +10,24 @@ public interface IEnrollmentService {
 
     List<EnrollmentDTO> findAllEnrollments();
 
-    Page<EnrollmentDTO> findAllEnrollmentsPaged(Pageable pageable);
+    Page<EnrollmentDTO> findAllEnrollmentsPaged(
+            Pageable pageable
+    );
 
-    EnrollmentDTO findByIdEnrollment(Long id);
+    EnrollmentDTO findByIdEnrollment(
+            Long id
+    );
 
-    EnrollmentDTO saveEnrollment(EnrollmentDTO enrollmentDTO);
+    EnrollmentDTO saveEnrollment(
+            EnrollmentDTO enrollmentDTO
+    );
 
-    EnrollmentDTO updateEnrollment(Long id, EnrollmentDTO enrollmentDTO);
+    EnrollmentDTO updateEnrollment(
+            Long id,
+            EnrollmentDTO enrollmentDTO
+    );
 
-    void deleteEnrollment(Long id);
+    void deleteEnrollment(
+            Long id
+    );
 }

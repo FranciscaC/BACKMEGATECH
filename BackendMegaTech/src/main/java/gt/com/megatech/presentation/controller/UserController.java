@@ -17,25 +17,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping(
+        "/api/user"
+)
 @RequiredArgsConstructor
-@PreAuthorize("denyAll()")
+@PreAuthorize(
+        "denyAll()"
+)
 public class UserController {
     private final UserDetailServiceImplementation userDetailServiceImplementation;
 
-    @PreAuthorize("hasAuthority('CREATE')")
+    @PreAuthorize(
+            "hasAuthority('CREATE')"
+    )
     @PostMapping
     public ResponseEntity<AuthResponseDTO> register(
             @RequestBody @Valid AuthCreateUserRequestDTO authCreateUserRequestDTO
     ) {
         return new ResponseEntity<>(
-                this.userDetailServiceImplementation.createUser(authCreateUserRequestDTO),
+                this.userDetailServiceImplementation.createUser(
+                        authCreateUserRequestDTO
+                ),
                 HttpStatus.CREATED
         );
     }
 
-    @PreAuthorize("hasAuthority('UPDATE')")
-    @PutMapping("/{username}")
+    @PreAuthorize(
+            "hasAuthority('UPDATE')"
+    )
+    @PutMapping(
+            "/{username}"
+    )
     public ResponseEntity<AuthResponseDTO> updateUser(
             @PathVariable String username,
             @RequestBody @Valid AuthCreateUserRequestDTO authCreateUserRequestDTO
@@ -49,16 +61,26 @@ public class UserController {
         );
     }
 
-    @PreAuthorize("hasAuthority('DELETE')")
-    @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
-        this.userDetailServiceImplementation.deleteUser(username);
+    @PreAuthorize(
+            "hasAuthority('DELETE')"
+    )
+    @DeleteMapping(
+            "/{username}"
+    )
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable String username
+    ) {
+        this.userDetailServiceImplementation.deleteUser(
+                username
+        );
         return new ResponseEntity<>(
                 HttpStatus.NO_CONTENT
         );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
     @GetMapping
     public ResponseEntity<List<UserEntity>> findAllUsers() {
         return new ResponseEntity<>(
@@ -67,15 +89,25 @@ public class UserController {
         );
     }
 
-    @PreAuthorize("hasAuthority('READ')")
-    @GetMapping("/paged")
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/paged"
+    )
     public ResponseEntity<Page<UserEntity>> findAllUsersPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable
     ) {
-        Pageable customPageable = PageRequest.of(page, size, pageable.getSort());
-        Page<UserEntity> usersPage = userDetailServiceImplementation.findAllUsersPaged(customPageable);
+        Pageable customPageable = PageRequest.of(
+                page,
+                size,
+                pageable.getSort()
+        );
+        Page<UserEntity> usersPage = userDetailServiceImplementation.findAllUsersPaged(
+                customPageable
+        );
         return new ResponseEntity<>(
                 usersPage,
                 HttpStatus.OK

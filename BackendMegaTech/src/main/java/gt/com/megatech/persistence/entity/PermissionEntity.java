@@ -11,7 +11,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "permissions")
+@Table(
+        name = "permissions"
+)
 public class PermissionEntity {
 
     @Id

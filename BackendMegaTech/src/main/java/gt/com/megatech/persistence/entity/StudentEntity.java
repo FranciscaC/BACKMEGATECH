@@ -1,7 +1,6 @@
 package gt.com.megatech.persistence.entity;
 
 import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
-import gt.com.megatech.persistence.entity.enums.EducationLevelEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -14,8 +13,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "students")
-@ToString
+@Table(
+        name = "students"
+)
 public class StudentEntity {
 
     @Id
@@ -44,6 +44,44 @@ public class StudentEntity {
             unique = true
     )
     private String name;
+
+    @NotBlank(
+            message = "The cui must not be empty"
+    )
+    @Size(
+            min = 13,
+            max = 13,
+            message = "The cui must be exactly 13 characters long."
+    )
+    @Pattern(
+            regexp = "\\d{13}",
+            message = "The cui must contain exactly 13 numeric digits without spaces or separators."
+    )
+    @Column(
+            length = 13,
+            nullable = false,
+            unique = true
+    )
+    private String cui;
+
+    @NotBlank(
+            message = "The personal code must not be empty"
+    )
+    @Size(
+            min = 10,
+            max = 10,
+            message = "The personal code must be exactly 10 characters long."
+    )
+    @Pattern(
+            regexp = "^[a-zA-Z0-9-]{10}$",
+            message = "The personal code must contain only letters, digits, or hyphens and be exactly 10 characters."
+    )
+    @Column(
+            length = 10,
+            nullable = false,
+            unique = true
+    )
+    private String personalCode;
 
     @Past(
             message = "The birth date must be a date in the past."
@@ -103,17 +141,20 @@ public class StudentEntity {
     )
     private String address;
 
-    @Enumerated(
-            EnumType.STRING
+
+    @NotBlank(
+            message = "The education level must not be empty."
     )
-    @NotNull(
-            message = "EducationLevel cannot be null"
+    @Size(
+            max = 50,
+            message = "The education level must not exceed 50 characters."
     )
     @Column(
             name = "education_level",
-            nullable = false
+            nullable = false,
+            length = 50
     )
-    private EducationLevelEnum educationLevelEnum;
+    private String educationLevel;
 
     @Enumerated(
             EnumType.STRING
