@@ -4,6 +4,7 @@ import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,4 +24,5 @@ public class StudentLateDTO {
     private String educationLevel;
     private AcademicStatusEnum academicStatusEnum;
     private String latePaymentMessage;
+    private List<String> lateMonths;
 }

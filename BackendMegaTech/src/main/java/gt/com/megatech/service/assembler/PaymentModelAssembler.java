@@ -45,13 +45,11 @@ public class PaymentModelAssembler implements RepresentationModelAssembler<Payme
     }
 
     public @NonNull EntityModel<StudentLateDTO> toModelForLatePayment(
-            @NonNull StudentLateDTO studentLateDTO,
-            MonthEnum monthEnum,
-            Integer year
+            @NonNull StudentLateDTO studentLateDTO
     ) {
         return EntityModel.of(
                 studentLateDTO,
-                linkTo(methodOn(PaymentController.class).findAllStudentsWithLatePayments(monthEnum, year))
+                linkTo(methodOn(PaymentController.class).findAllStudentsWithLatePayments())
                         .withSelfRel()
         );
     }

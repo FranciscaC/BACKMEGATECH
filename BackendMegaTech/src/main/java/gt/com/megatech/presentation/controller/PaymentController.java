@@ -151,21 +151,15 @@ public class PaymentController {
     @GetMapping(
             "/late-payments"
     )
-    public CollectionModel<EntityModel<StudentLateDTO>> findAllStudentsWithLatePayments(
-            @RequestParam MonthEnum monthEnum,
-            @RequestParam Integer year
-    ) {
-        List<EntityModel<StudentLateDTO>> entityModelList = this.iPaymentService.findAllStudentsWithLatePayments(
-                        monthEnum,
-                        year
-                )
+    public CollectionModel<EntityModel<StudentLateDTO>> findAllStudentsWithLatePayments() {
+        List<EntityModel<StudentLateDTO>> entityModelList = this.iPaymentService.findAllStudentsWithLatePayments()
                 .stream()
                 .map(studentLateDTO -> paymentModelAssembler
-                        .toModelForLatePayment(studentLateDTO, monthEnum, year))
+                        .toModelForLatePayment(studentLateDTO))
                 .toList();
         return CollectionModel.of(
                 entityModelList,
-                linkTo(methodOn(PaymentController.class).findAllStudentsWithLatePayments(monthEnum, year))
+                linkTo(methodOn(PaymentController.class).findAllStudentsWithLatePayments())
                         .withSelfRel()
         );
     }

@@ -29,10 +29,7 @@ public interface IPaymentService {
             Pageable pageable
     );
 
-    List<StudentLateDTO> findAllStudentsWithLatePayments(
-            MonthEnum monthEnum,
-            Integer year
-    );
+    List<StudentLateDTO> findAllStudentsWithLatePayments();
 
     Page<StudentLateDTO> findAllStudentsWithLatePayments(
             MonthEnum monthEnum,

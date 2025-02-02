@@ -202,6 +202,7 @@ public class GuardianServiceImplementation implements IGuardianService {
         return GuardianDTO.builder()
                 .id(guardianEntity.getId())
                 .name(guardianEntity.getName())
+                .dpi(guardianEntity.getDpi())
                 .phone(guardianEntity.getPhone())
                 .address(guardianEntity.getAddress())
                 .studentDTOS(Collections.emptySet())

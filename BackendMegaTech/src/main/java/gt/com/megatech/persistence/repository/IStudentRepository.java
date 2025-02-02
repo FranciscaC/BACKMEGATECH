@@ -124,4 +124,16 @@ public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
             @Param("targetDate") LocalDate targetDate,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT s
+            FROM StudentEntity s
+            JOIN EnrollmentEntity e ON e.studentEntity = s
+            WHERE s.academicStatusEnum = :academicStatusEnum
+            AND e.enrollmentDate <= :targetDate
+            """)
+    List<StudentEntity> findAllStudentsWithLatePayments(
+            @Param("academicStatusEnum") AcademicStatusEnum academicStatusEnum,
+            @Param("targetDate") LocalDate targetDate
+    );
 }

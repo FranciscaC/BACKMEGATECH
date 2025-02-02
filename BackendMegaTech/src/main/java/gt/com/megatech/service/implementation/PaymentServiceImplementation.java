@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -107,28 +108,36 @@ public class PaymentServiceImplementation implements IPaymentService {
             readOnly = true
     )
     @Override
-    public List<StudentLateDTO> findAllStudentsWithLatePayments(
-            MonthEnum monthEnum,
-            Integer year
-    ) {
-        YearMonth requestedYearMonth = YearMonth.of(year, monthEnum.ordinal() + 1);
-        LocalDate targetDate = requestedYearMonth.atEndOfMonth();
-        if (YearMonth.now().isBefore(requestedYearMonth.plusMonths(1))) {
-            throw new IllegalArgumentException("Cannot calculate late payments for a future month.");
-        }
-        List<StudentEntity> lateStudents = iStudentRepository.findAllStudentsWithLatePayments(
+    public List<StudentLateDTO> findAllStudentsWithLatePayments() {
+        LocalDate now = LocalDate.now();
+        YearMonth lastCompleteYearMonth = YearMonth.from(now).minusMonths(1);
+        LocalDate targetDate = lastCompleteYearMonth.atEndOfMonth();
+        List<StudentEntity> studentEntityList = iStudentRepository.findAllStudentsWithLatePayments(
                 AcademicStatusEnum.STUDYING,
-                monthEnum,
-                year,
                 targetDate
         );
-        return lateStudents.stream()
-                .map(student -> {
-                    StudentLateDTO dto = convertToStudentLateDTO(student);
-                    dto.setLatePaymentMessage("Student has a late payment for " + monthEnum.name() + " " + year);
-                    return dto;
-                })
-                .toList();
+        List<StudentLateDTO> result = new ArrayList<>();
+        for (StudentEntity student : studentEntityList) {
+            LocalDate enrollmentDate = student.getEnrollmentEntity().getEnrollmentDate();
+            YearMonth enrollmentYearMonth = YearMonth.from(enrollmentDate);
+            List<String> lateMonths = new ArrayList<>();
+            for (YearMonth ym = enrollmentYearMonth; ym.compareTo(lastCompleteYearMonth) <= 0; ym = ym.plusMonths(1)) {
+                MonthEnum monthEnum = MonthEnum.valueOf(ym.getMonth().name());
+                int year = ym.getYear();
+                boolean paymentExists = iPaymentRepository.existsByStudentEntityAndMonthEnumAndYear(student, monthEnum, year);
+                if (!paymentExists) {
+                    lateMonths.add(ym.getMonth().name() + " " + year);
+                }
+            }
+            if (!lateMonths.isEmpty()) {
+                String message = "Student has late payments for the following months: " + String.join(", ", lateMonths);
+                StudentLateDTO dto = convertToStudentLateDTO(student);
+                dto.setLateMonths(lateMonths);
+                dto.setLatePaymentMessage(message);
+                result.add(dto);
+            }
+        }
+        return result;
     }
 
     @Transactional(
@@ -264,6 +273,7 @@ public class PaymentServiceImplementation implements IPaymentService {
                 .id(studentEntity.getId())
                 .name(studentEntity.getName())
                 .cui(studentEntity.getCui())
+                .personalCode(studentEntity.getPersonalCode())
                 .birthDate(studentEntity.getBirthDate())
                 .phone(studentEntity.getPhone())
                 .email(studentEntity.getEmail())
@@ -288,6 +298,7 @@ public class PaymentServiceImplementation implements IPaymentService {
                 .educationLevel(studentEntity.getEducationLevel())
                 .academicStatusEnum(studentEntity.getAcademicStatusEnum())
                 .latePaymentMessage("")
+                .lateMonths(null)
                 .build();
     }
 }
