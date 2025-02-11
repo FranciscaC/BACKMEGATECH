@@ -156,18 +156,28 @@ public class StudentServiceImplementation implements IStudentService {
             Long id,
             StudentDTO studentDTO
     ) {
-        StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
+        GuardianEntity guardianEntityExists = this.iGuardianRepository.findById(studentDTO.getGuardianDTO().getId())
+                .orElseThrow(() -> new GuardianNotFoundException(studentDTO.getGuardianDTO().getId()));
+        this.iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
-        studentEntityExists.setName(studentDTO.getName());
-        studentEntityExists.setCui(studentDTO.getCui());
-        studentEntityExists.setPersonalCode(studentDTO.getPersonalCode());
-        studentEntityExists.setBirthDate(studentDTO.getBirthDate());
-        studentEntityExists.setPhone(studentDTO.getPhone());
-        studentEntityExists.setEmail(studentDTO.getEmail());
-        studentEntityExists.setAddress(studentDTO.getAddress());
-        studentEntityExists.setEducationLevel(studentDTO.getEducationLevel());
-        studentEntityExists.setAcademicStatusEnum(studentDTO.getAcademicStatusEnum());
-        StudentEntity studentUpdated = this.iStudentRepository.save(studentEntityExists);
+        int rowsAffected = this.iStudentRepository.updateStudentById(
+                id,
+                studentDTO.getName(),
+                studentDTO.getCui(),
+                studentDTO.getPersonalCode(),
+                studentDTO.getBirthDate(),
+                studentDTO.getPhone(),
+                studentDTO.getEmail(),
+                studentDTO.getAddress(),
+                studentDTO.getEducationLevel(),
+                studentDTO.getAcademicStatusEnum(),
+                guardianEntityExists
+        );
+        if (rowsAffected == 0) {
+            throw new IllegalStateException("No student could be updated with ID: " + id);
+        }
+        StudentEntity studentUpdated = this.iStudentRepository.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id));
         return convertToStudentDTO(studentUpdated);
     }
 

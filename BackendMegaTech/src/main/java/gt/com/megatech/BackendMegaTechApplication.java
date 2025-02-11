@@ -46,12 +46,18 @@ public class BackendMegaTechApplication {
             RoleEntity roleAdmin = RoleEntity
                     .builder()
                     .roleEnum(RoleEnum.ADMIN)
-                    .permissionList(Set.of(readPermission, createPermission, updatePermission, deletePermission))
+                    .permissionList(Set.of(
+                            readPermission,
+                            createPermission,
+                            updatePermission,
+                            deletePermission))
                     .build();
             RoleEntity roleUser = RoleEntity
                     .builder()
                     .roleEnum(RoleEnum.USER)
-                    .permissionList(Set.of(readPermission, createPermission))
+                    .permissionList(Set.of(
+                            readPermission,
+                            createPermission))
                     .build();
 
             // Creating users

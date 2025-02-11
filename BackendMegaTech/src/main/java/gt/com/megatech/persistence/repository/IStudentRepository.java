@@ -1,5 +1,6 @@
 package gt.com.megatech.persistence.repository;
 
+import gt.com.megatech.persistence.entity.GuardianEntity;
 import gt.com.megatech.persistence.entity.StudentEntity;
 import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
 import gt.com.megatech.persistence.entity.enums.MonthEnum;
@@ -47,6 +48,35 @@ public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
     int updateAcademicStatusById(
             @Param("id") Long id,
             @Param("academicStatusEnum") AcademicStatusEnum academicStatusEnum
+    );
+
+    @Modifying
+    @Query("""
+        UPDATE StudentEntity s 
+        SET s.name = :name,
+            s.cui = :cui,
+            s.personalCode = :personalCode,
+            s.birthDate = :birthDate,
+            s.phone = :phone,
+            s.email = :email,
+            s.address = :address,
+            s.educationLevel = :educationLevel,
+            s.academicStatusEnum = :academicStatusEnum,
+            s.guardianEntity = :guardianEntity
+        WHERE s.id = :id
+    """)
+    int updateStudentById(
+            @Param("id") Long id,
+            @Param("name") String name,
+            @Param("cui") String cui,
+            @Param("personalCode") String personalCode,
+            @Param("birthDate") LocalDate birthDate,
+            @Param("phone") String phone,
+            @Param("email") String email,
+            @Param("address") String address,
+            @Param("educationLevel") String educationLevel,
+            @Param("academicStatusEnum") AcademicStatusEnum academicStatusEnum,
+            @Param("guardianEntity") GuardianEntity guardianEntity
     );
 
     @Query("""
