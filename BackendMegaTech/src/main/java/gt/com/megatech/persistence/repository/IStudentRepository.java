@@ -134,28 +134,6 @@ public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
     );
 
     @Query("""
-             SELECT s
-              FROM StudentEntity s
-              JOIN EnrollmentEntity e ON e.studentEntity = s
-              WHERE s.academicStatusEnum = :academicStatusEnum
-              AND NOT EXISTS (
-                  SELECT p
-                  FROM PaymentEntity p
-                  WHERE p.studentEntity = s
-                  AND p.monthEnum = :monthEnum
-                  AND p.year = :year
-              )
-              AND e.enrollmentDate <= :targetDate
-            """)
-    Page<StudentEntity> findAllStudentsWithLatePayments(
-            @Param("academicStatusEnum") AcademicStatusEnum academicStatusEnum,
-            @Param("monthEnum") MonthEnum monthEnum,
-            @Param("year") int year,
-            @Param("targetDate") LocalDate targetDate,
-            Pageable pageable
-    );
-
-    @Query("""
             SELECT s
             FROM StudentEntity s
             JOIN EnrollmentEntity e ON e.studentEntity = s
@@ -165,5 +143,18 @@ public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
     List<StudentEntity> findAllStudentsWithLatePayments(
             @Param("academicStatusEnum") AcademicStatusEnum academicStatusEnum,
             @Param("targetDate") LocalDate targetDate
+    );
+
+    @Query("""
+            SELECT s
+            FROM StudentEntity s
+            JOIN EnrollmentEntity e ON e.studentEntity = s
+            WHERE s.academicStatusEnum = :academicStatusEnum
+            AND e.enrollmentDate <= :targetDate
+            """)
+    Page<StudentEntity> findAllStudentsWithLatePayments(
+            @Param("academicStatusEnum") AcademicStatusEnum academicStatusEnum,
+            @Param("targetDate") LocalDate targetDate,
+            Pageable pageable
     );
 }

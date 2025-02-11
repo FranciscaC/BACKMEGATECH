@@ -154,8 +154,7 @@ public class PaymentController {
     public CollectionModel<EntityModel<StudentLateDTO>> findAllStudentsWithLatePayments() {
         List<EntityModel<StudentLateDTO>> entityModelList = this.iPaymentService.findAllStudentsWithLatePayments()
                 .stream()
-                .map(studentLateDTO -> paymentModelAssembler
-                        .toModelForLatePayment(studentLateDTO))
+                .map(paymentModelAssembler::toModelForLatePayment)
                 .toList();
         return CollectionModel.of(
                 entityModelList,
@@ -173,9 +172,7 @@ public class PaymentController {
     public ResponseEntity<PagedModel<EntityModel<StudentLateDTO>>> findAllStudentsWithLatePayments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            Pageable pageable,
-            @RequestParam MonthEnum monthEnum,
-            @RequestParam Integer year
+            Pageable pageable
     ) {
         Pageable customPageable = PageRequest.of(
                 page,
@@ -183,8 +180,6 @@ public class PaymentController {
                 pageable.getSort()
         );
         Page<StudentLateDTO> studentLateDTOPage = this.iPaymentService.findAllStudentsWithLatePayments(
-                monthEnum,
-                year,
                 customPageable
         );
         PagedModel<EntityModel<StudentLateDTO>> entityModelPagedModel = studentLateDTOPagedResourcesAssembler
@@ -232,5 +227,16 @@ public class PaymentController {
         return ResponseEntity
                 .created(responseCollectionModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(responseCollectionModel);
+    }
+
+    @PreAuthorize("hasAuthority('UPDATE')")
+    @PutMapping("/{id}")
+    public ResponseEntity<EntityModel<PaymentDTO>> updatePayment(
+            @PathVariable Long id,
+            @RequestBody @Valid PaymentRequestDTO paymentRequestDTO
+    ) {
+        PaymentDTO updatedPayment = this.iPaymentService.updatePayment(id, paymentRequestDTO);
+        EntityModel<PaymentDTO> entityModel = paymentModelAssembler.toModel(updatedPayment);
+        return ResponseEntity.ok(entityModel);
     }
 }

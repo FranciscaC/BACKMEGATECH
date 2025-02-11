@@ -32,8 +32,6 @@ public interface IPaymentService {
     List<StudentLateDTO> findAllStudentsWithLatePayments();
 
     Page<StudentLateDTO> findAllStudentsWithLatePayments(
-            MonthEnum monthEnum,
-            Integer year,
             Pageable pageable
     );
 
@@ -43,5 +41,10 @@ public interface IPaymentService {
 
     List<PaymentDTO> savePayments(
             PaymentRequestDTO paymentRequestDTO
+    );
+
+    PaymentDTO updatePayment(
+            Long paymentId,
+            PaymentRequestDTO updatedPaymentDetail
     );
 }

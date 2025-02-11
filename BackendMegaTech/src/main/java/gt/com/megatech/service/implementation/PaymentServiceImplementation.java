@@ -2,14 +2,17 @@ package gt.com.megatech.service.implementation;
 
 import gt.com.megatech.persistence.entity.PaymentEntity;
 import gt.com.megatech.persistence.entity.StudentEntity;
+import gt.com.megatech.persistence.entity.SuspendedStudentEntity;
 import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
 import gt.com.megatech.persistence.entity.enums.MonthEnum;
 import gt.com.megatech.persistence.repository.IPaymentRepository;
 import gt.com.megatech.persistence.repository.IStudentRepository;
+import gt.com.megatech.persistence.repository.ISuspendedStudentRepository;
 import gt.com.megatech.presentation.dto.*;
 import gt.com.megatech.service.exception.PaymentNotFoundException;
 import gt.com.megatech.service.exception.StudentNotFoundException;
 import gt.com.megatech.service.interfaces.IPaymentService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +24,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class PaymentServiceImplementation implements IPaymentService {
 
     private final IPaymentRepository iPaymentRepository;
     private final IStudentRepository iStudentRepository;
+    private final ISuspendedStudentRepository iSuspendedStudentRepository;
 
     @Transactional(
             readOnly = true
@@ -121,12 +126,22 @@ public class PaymentServiceImplementation implements IPaymentService {
             LocalDate enrollmentDate = student.getEnrollmentEntity().getEnrollmentDate();
             YearMonth enrollmentYearMonth = YearMonth.from(enrollmentDate);
             List<String> lateMonths = new ArrayList<>();
-            for (YearMonth ym = enrollmentYearMonth; ym.compareTo(lastCompleteYearMonth) <= 0; ym = ym.plusMonths(1)) {
-                MonthEnum monthEnum = MonthEnum.valueOf(ym.getMonth().name());
-                int year = ym.getYear();
-                boolean paymentExists = iPaymentRepository.existsByStudentEntityAndMonthEnumAndYear(student, monthEnum, year);
-                if (!paymentExists) {
-                    lateMonths.add(ym.getMonth().name() + " " + year);
+            List<SuspendedStudentEntity> suspensions = iSuspendedStudentRepository.findByStudentEntity(student);
+            for (YearMonth yearMonth = enrollmentYearMonth; yearMonth.compareTo(lastCompleteYearMonth) <= 0; yearMonth = yearMonth.plusMonths(1)) {
+                MonthEnum monthEnum = MonthEnum.valueOf(yearMonth.getMonth().name());
+                int year = yearMonth.getYear();
+                YearMonth finalYearMonth = yearMonth;
+                boolean isSuspended = suspensions.stream().anyMatch(suspension ->
+                        isWithinSuspensionPeriod(
+                                finalYearMonth,
+                                suspension.getSuspensionDate(),
+                                suspension.getReentryDate())
+                );
+                if (!isSuspended) {
+                    boolean paymentExists = iPaymentRepository.existsByStudentEntityAndMonthEnumAndYear(student, monthEnum, year);
+                    if (!paymentExists) {
+                        lateMonths.add(yearMonth.getMonth().name() + " " + year);
+                    }
                 }
             }
             if (!lateMonths.isEmpty()) {
@@ -144,29 +159,48 @@ public class PaymentServiceImplementation implements IPaymentService {
             readOnly = true
     )
     @Override
-    public Page<StudentLateDTO> findAllStudentsWithLatePayments(
-            MonthEnum monthEnum,
-            Integer year,
-            Pageable pageable
-    ) {
-        YearMonth requestedYearMonth = YearMonth.of(year, monthEnum.ordinal() + 1);
-        LocalDate targetDate = requestedYearMonth.atEndOfMonth();
-        if (YearMonth.now().isBefore(requestedYearMonth.plusMonths(1))) {
-            throw new IllegalArgumentException("Cannot calculate late payments for a future month.");
-        }
+    public Page<StudentLateDTO> findAllStudentsWithLatePayments(Pageable pageable) {
+        LocalDate now = LocalDate.now();
+        YearMonth lastCompleteYearMonth = YearMonth.from(now).minusMonths(1);
+        LocalDate targetDate = lastCompleteYearMonth.atEndOfMonth();
         Page<StudentEntity> studentPage = iStudentRepository.findAllStudentsWithLatePayments(
                 AcademicStatusEnum.STUDYING,
-                monthEnum,
-                year,
                 targetDate,
                 pageable
         );
         List<StudentLateDTO> studentLateDTOs = studentPage.stream()
                 .map(student -> {
-                    StudentLateDTO dto = convertToStudentLateDTO(student);
-                    dto.setLatePaymentMessage("Student has a late payment for " + monthEnum.name() + " " + year);
-                    return dto;
+                    LocalDate enrollmentDate = student.getEnrollmentEntity().getEnrollmentDate();
+                    YearMonth enrollmentYearMonth = YearMonth.from(enrollmentDate);
+                    List<String> lateMonths = new ArrayList<>();
+                    List<SuspendedStudentEntity> suspensions = iSuspendedStudentRepository.findByStudentEntity(student);
+                    for (YearMonth yearMonth = enrollmentYearMonth; yearMonth.compareTo(lastCompleteYearMonth) <= 0; yearMonth = yearMonth.plusMonths(1)) {
+                        MonthEnum monthEnum = MonthEnum.valueOf(yearMonth.getMonth().name());
+                        int year = yearMonth.getYear();
+                        YearMonth finalYearMonth = yearMonth;
+                        boolean isSuspended = suspensions.stream().anyMatch(suspension ->
+                                isWithinSuspensionPeriod(
+                                        finalYearMonth,
+                                        suspension.getSuspensionDate(),
+                                        suspension.getReentryDate())
+                        );
+                        if (!isSuspended) {
+                            boolean paymentExists = iPaymentRepository.existsByStudentEntityAndMonthEnumAndYear(student, monthEnum, year);
+                            if (!paymentExists) {
+                                lateMonths.add(yearMonth.getMonth().name() + " " + year);
+                            }
+                        }
+                    }
+                    if (!lateMonths.isEmpty()) {
+                        String message = "Student has late payments for the following months: " + String.join(", ", lateMonths);
+                        StudentLateDTO dto = convertToStudentLateDTO(student);
+                        dto.setLateMonths(lateMonths);
+                        dto.setLatePaymentMessage(message);
+                        return dto;
+                    }
+                    return null;
                 })
+                .filter(Objects::nonNull)
                 .toList();
         return new PageImpl<>(
                 studentLateDTOs,
@@ -231,6 +265,48 @@ public class PaymentServiceImplementation implements IPaymentService {
         return savedPayments.stream()
                 .map(this::convertToPaymentDTO)
                 .toList();
+    }
+
+    @Transactional
+    @Override
+    public PaymentDTO updatePayment(Long paymentId, PaymentRequestDTO updatedPaymentRequest) {
+        PaymentEntity paymentEntity = this.iPaymentRepository.findById(paymentId)
+                .orElseThrow(() -> new EntityNotFoundException("Payment with ID " + paymentId + " not found"));
+        if (!paymentEntity.getStudentEntity().getAcademicStatusEnum().equals(AcademicStatusEnum.STUDYING)) {
+            throw new IllegalStateException("Only students with STUDYING status can update payments.");
+        }
+        if (updatedPaymentRequest.getPaymentDetailDTOS().isEmpty()) {
+            throw new IllegalArgumentException("Payment details cannot be empty.");
+        }
+        PaymentDetailDTO updatedPaymentDetail = updatedPaymentRequest.getPaymentDetailDTOS().get(0);
+        boolean exists = this.iPaymentRepository.existsByStudentEntityAndMonthEnumAndYear(
+                paymentEntity.getStudentEntity(), updatedPaymentDetail.getMonthEnum(), updatedPaymentDetail.getYear()
+        );
+        if (exists && (!paymentEntity.getMonthEnum().equals(updatedPaymentDetail.getMonthEnum()) ||
+                !Objects.equals(paymentEntity.getYear(), updatedPaymentDetail.getYear()))) {
+            throw new IllegalStateException("A payment for " + updatedPaymentDetail.getMonthEnum() + " " +
+                    updatedPaymentDetail.getYear() + " already exists.");
+        }
+        paymentEntity.setAmountPaid(updatedPaymentDetail.getAmountPaid());
+        paymentEntity.setMonthEnum(updatedPaymentDetail.getMonthEnum());
+        paymentEntity.setYear(updatedPaymentDetail.getYear());
+        paymentEntity.setPaymentDate(updatedPaymentDetail.getPaymentDate());
+        PaymentEntity updatedPayment = this.iPaymentRepository.save(paymentEntity);
+        return convertToPaymentDTO(updatedPayment);
+    }
+
+    private boolean isWithinSuspensionPeriod(
+            YearMonth yearMonth,
+            LocalDate suspensionDate,
+            LocalDate reentryDate
+    ) {
+        YearMonth suspensionYM = YearMonth.from(
+                suspensionDate
+        );
+        YearMonth reentryYM = (reentryDate != null) ?
+                YearMonth.from(reentryDate) :
+                YearMonth.now().plusMonths(1);
+        return (yearMonth.compareTo(suspensionYM) >= 0) && (yearMonth.compareTo(reentryYM) < 0);
     }
 
     private PaymentDTO convertToPaymentDTO(
