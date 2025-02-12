@@ -1,12 +1,10 @@
 package gt.com.megatech.service.implementation;
 
-import gt.com.megatech.persistence.entity.GuardianEntity;
-import gt.com.megatech.persistence.entity.StudentEntity;
-import gt.com.megatech.persistence.repository.IEnrollmentRepository;
-import gt.com.megatech.persistence.repository.IGuardianRepository;
-import gt.com.megatech.persistence.repository.IStudentRepository;
+import gt.com.megatech.persistence.entity.*;
+import gt.com.megatech.persistence.repository.*;
 import gt.com.megatech.presentation.dto.GuardianDTO;
 import gt.com.megatech.presentation.dto.StudentDTO;
+import gt.com.megatech.service.exception.GraduatedStudentNotFoundException;
 import gt.com.megatech.service.exception.GuardianNotFoundException;
 import gt.com.megatech.service.interfaces.IGuardianService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +24,9 @@ public class GuardianServiceImplementation implements IGuardianService {
     private final IGuardianRepository iGuardianRepository;
     private final IStudentRepository iStudentRepository;
     private final IEnrollmentRepository iEnrollmentRepository;
+    private final IPaymentRepository iPaymentRepository;
+    private final ISuspendedStudentRepository iSuspendedStudentRepository;
+    private final IGraduatedStudentRepository iGraduatedStudentRepository;
 
     @Transactional(
             readOnly = true
@@ -129,20 +130,35 @@ public class GuardianServiceImplementation implements IGuardianService {
 
     @Transactional
     @Override
-    public void deleteGuardian(
-            Long id
-    ) {
+    public void deleteGuardian(Long id) {
         GuardianEntity guardianEntity = this.iGuardianRepository.findById(id)
                 .orElseThrow(() -> new GuardianNotFoundException(id));
         guardianEntity.getStudentEntities().forEach(student -> {
-            if (student.getEnrollmentEntity() != null) {
-                this.iEnrollmentRepository.delete(student.getEnrollmentEntity());
+            GraduatedStudentEntity graduatedRecord = iGraduatedStudentRepository
+                    .findByStudentEntity_Id(student.getId())
+                    .orElseThrow(() -> new GraduatedStudentNotFoundException(student.getId()));
+            if (graduatedRecord != null) {
+                if (student.getEnrollmentEntity() != null) {
+                    EnrollmentEntity enrollment = student.getEnrollmentEntity();
+                    student.setEnrollmentEntity(null);
+                    enrollment.setStudentEntity(null);
+                    iEnrollmentRepository.delete(enrollment);
+                }
+                List<PaymentEntity> payments = iPaymentRepository.findByStudentEntity_Id(student.getId());
+                if (payments != null && !payments.isEmpty()) {
+                    iPaymentRepository.deleteAll(payments);
+                }
+                List<SuspendedStudentEntity> suspensions = iSuspendedStudentRepository.findByStudentEntity_Id(student.getId());
+                if (suspensions != null && !suspensions.isEmpty()) {
+                    iSuspendedStudentRepository.deleteAll(suspensions);
+                }
+                iGraduatedStudentRepository.delete(graduatedRecord);
+                iStudentRepository.delete(student);
             }
-            this.iStudentRepository.delete(student);
         });
         guardianEntity.getStudentEntities().clear();
-        this.iGuardianRepository.delete(guardianEntity);
-        this.iGuardianRepository.flush();
+        iGuardianRepository.delete(guardianEntity);
+        iGuardianRepository.flush();
     }
 
     private GuardianDTO convertToGuardianDTO(

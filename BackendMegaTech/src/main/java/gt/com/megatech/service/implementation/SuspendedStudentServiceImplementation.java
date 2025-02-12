@@ -2,7 +2,6 @@ package gt.com.megatech.service.implementation;
 
 import gt.com.megatech.persistence.entity.StudentEntity;
 import gt.com.megatech.persistence.entity.SuspendedStudentEntity;
-import gt.com.megatech.persistence.repository.IStudentRepository;
 import gt.com.megatech.persistence.repository.ISuspendedStudentRepository;
 import gt.com.megatech.presentation.dto.StudentDTO;
 import gt.com.megatech.presentation.dto.SuspendedStudentDTO;
@@ -22,7 +21,6 @@ import java.util.List;
 public class SuspendedStudentServiceImplementation implements ISuspendedStudentService {
 
     private final IStudentService iStudentService;
-    private final IStudentRepository iStudentRepository;
     private final ISuspendedStudentRepository iSuspendedStudentRepository;
 
     @Transactional(

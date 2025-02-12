@@ -17,5 +17,5 @@ public class GraduatedStudentDTO {
     private MonthEnum graduationMonth;
     private Integer graduationYear;
     private LocalDate graduationDate;
-    private StudentEntity studentEntity;
+    private StudentDTO studentDTO;
 }

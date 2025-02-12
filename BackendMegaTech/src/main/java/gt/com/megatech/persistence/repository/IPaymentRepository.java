@@ -29,4 +29,6 @@ public interface IPaymentRepository extends JpaRepository<PaymentEntity, Long> {
             Integer year,
             Pageable pageable
     );
+
+    List<PaymentEntity> findByStudentEntity_Id(Long studentId);
 }

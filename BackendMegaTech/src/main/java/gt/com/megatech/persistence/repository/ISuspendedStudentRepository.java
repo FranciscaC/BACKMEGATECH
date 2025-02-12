@@ -8,5 +8,7 @@ import java.util.List;
 
 public interface ISuspendedStudentRepository extends JpaRepository<SuspendedStudentEntity, Long> {
 
+    List<SuspendedStudentEntity> findByStudentEntity_Id(Long studentId);
+
     List<SuspendedStudentEntity> findByStudentEntity(StudentEntity studentEntity);
 }

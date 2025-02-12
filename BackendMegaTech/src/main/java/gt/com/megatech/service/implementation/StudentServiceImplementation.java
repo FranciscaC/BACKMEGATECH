@@ -1,15 +1,12 @@
 package gt.com.megatech.service.implementation;
 
-import gt.com.megatech.persistence.entity.GraduatedStudentEntity;
-import gt.com.megatech.persistence.entity.GuardianEntity;
-import gt.com.megatech.persistence.entity.StudentEntity;
+import gt.com.megatech.persistence.entity.*;
 import gt.com.megatech.persistence.entity.enums.AcademicStatusEnum;
 import gt.com.megatech.persistence.entity.enums.MonthEnum;
-import gt.com.megatech.persistence.repository.IGraduatedStudentRepository;
-import gt.com.megatech.persistence.repository.IGuardianRepository;
-import gt.com.megatech.persistence.repository.IStudentRepository;
+import gt.com.megatech.persistence.repository.*;
 import gt.com.megatech.presentation.dto.GuardianDTO;
 import gt.com.megatech.presentation.dto.StudentDTO;
+import gt.com.megatech.service.exception.GraduatedStudentNotFoundException;
 import gt.com.megatech.service.exception.GuardianNotFoundException;
 import gt.com.megatech.service.exception.StudentNotFoundException;
 import gt.com.megatech.service.interfaces.IStudentService;
@@ -28,6 +25,9 @@ public class StudentServiceImplementation implements IStudentService {
 
     private final IGuardianRepository iGuardianRepository;
     private final IStudentRepository iStudentRepository;
+    private final IEnrollmentRepository iEnrollmentRepository;
+    private final IPaymentRepository iPaymentRepository;
+    private final ISuspendedStudentRepository iSuspendedStudentRepository;
     private final IGraduatedStudentRepository iGraduatedStudentRepository;
 
     private static final String UPDATED_ILLEGAL_STATE_EXCEPTION = "Failed to update academic status.";
@@ -252,12 +252,28 @@ public class StudentServiceImplementation implements IStudentService {
 
     @Transactional
     @Override
-    public void deleteStudent(
-            Long id
-    ) {
-        StudentEntity studentEntityExists = this.iStudentRepository.findById(id)
+    public void deleteStudent(Long id) {
+        StudentEntity student = iStudentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
-        this.iStudentRepository.delete(studentEntityExists);
+        GraduatedStudentEntity graduatedRecord = iGraduatedStudentRepository
+                .findByStudentEntity_Id(student.getId())
+                .orElseThrow(() -> new GraduatedStudentNotFoundException(student.getId()));
+        if (student.getEnrollmentEntity() != null) {
+            EnrollmentEntity enrollment = student.getEnrollmentEntity();
+            student.setEnrollmentEntity(null);
+            enrollment.setStudentEntity(null);
+            iEnrollmentRepository.delete(enrollment);
+        }
+        List<PaymentEntity> payments = iPaymentRepository.findByStudentEntity_Id(student.getId());
+        if (payments != null && !payments.isEmpty()) {
+            iPaymentRepository.deleteAll(payments);
+        }
+        List<SuspendedStudentEntity> suspensions = iSuspendedStudentRepository.findByStudentEntity_Id(student.getId());
+        if (suspensions != null && !suspensions.isEmpty()) {
+            iSuspendedStudentRepository.deleteAll(suspensions);
+        }
+        iGraduatedStudentRepository.delete(graduatedRecord);
+        iStudentRepository.delete(student);
     }
 
     private StudentDTO convertToStudentDTO(
