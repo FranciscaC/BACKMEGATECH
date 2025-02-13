@@ -169,14 +169,12 @@ public class UserDetailServiceImplementation implements UserDetailsService {
         );
     }
 
-    public void deleteUser(
-            String username
-    ) {
+    public void deleteUser(String username) {
         UserEntity existingUser = iUserRepository.findUserEntityByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " " + DOES_NOT_EXIST));
-        iUserRepository.delete(
-                existingUser
-        );
+                .orElseThrow(() -> new UsernameNotFoundException("The user " + username + " does not exist"));
+        existingUser.getRoles().clear();
+        iUserRepository.save(existingUser);
+        iUserRepository.delete(existingUser);
     }
 
     public List<UserEntity> findAllUsers() {

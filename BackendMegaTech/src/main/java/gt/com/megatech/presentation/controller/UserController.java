@@ -25,7 +25,44 @@ import java.util.List;
         "denyAll()"
 )
 public class UserController {
+
     private final UserDetailServiceImplementation userDetailServiceImplementation;
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping
+    public ResponseEntity<List<UserEntity>> findAllUsers() {
+        return new ResponseEntity<>(
+                this.userDetailServiceImplementation.findAllUsers(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/paged"
+    )
+    public ResponseEntity<Page<UserEntity>> findAllUsersPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Pageable pageable
+    ) {
+        Pageable customPageable = PageRequest.of(
+                page,
+                size,
+                pageable.getSort()
+        );
+        Page<UserEntity> usersPage = userDetailServiceImplementation.findAllUsersPaged(
+                customPageable
+        );
+        return new ResponseEntity<>(
+                usersPage,
+                HttpStatus.OK
+        );
+    }
 
     @PreAuthorize(
             "hasAuthority('CREATE')"
@@ -75,42 +112,6 @@ public class UserController {
         );
         return new ResponseEntity<>(
                 HttpStatus.NO_CONTENT
-        );
-    }
-
-    @PreAuthorize(
-            "hasAuthority('READ')"
-    )
-    @GetMapping
-    public ResponseEntity<List<UserEntity>> findAllUsers() {
-        return new ResponseEntity<>(
-                this.userDetailServiceImplementation.findAllUsers(),
-                HttpStatus.OK
-        );
-    }
-
-    @PreAuthorize(
-            "hasAuthority('READ')"
-    )
-    @GetMapping(
-            "/paged"
-    )
-    public ResponseEntity<Page<UserEntity>> findAllUsersPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Pageable pageable
-    ) {
-        Pageable customPageable = PageRequest.of(
-                page,
-                size,
-                pageable.getSort()
-        );
-        Page<UserEntity> usersPage = userDetailServiceImplementation.findAllUsersPaged(
-                customPageable
-        );
-        return new ResponseEntity<>(
-                usersPage,
-                HttpStatus.OK
         );
     }
 }
