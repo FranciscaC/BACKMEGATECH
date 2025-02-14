@@ -10,8 +10,6 @@ import gt.com.megatech.service.exception.EnrollmentNotFoundException;
 import gt.com.megatech.service.exception.StudentNotFoundException;
 import gt.com.megatech.service.interfaces.IEnrollmentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,17 +31,6 @@ public class EnrollmentServiceImplementation implements IEnrollmentService {
                 .stream()
                 .map(this::convertToEnrollmentDTO)
                 .toList();
-    }
-
-    @Transactional(
-            readOnly = true
-    )
-    @Override
-    public Page<EnrollmentDTO> findAllEnrollmentsPaged(
-            Pageable pageable
-    ) {
-        return this.iEnrollmentRepository.findAll(pageable)
-                .map(this::convertToEnrollmentDTO);
     }
 
     @Transactional(

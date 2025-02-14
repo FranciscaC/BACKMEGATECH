@@ -93,6 +93,42 @@ public class StudentController {
             "hasAuthority('READ')"
     )
     @GetMapping(
+            "/enrolled"
+    )
+    public CollectionModel<EntityModel<StudentDTO>> findAllEnrolledStudents() {
+        List<EntityModel<StudentDTO>> students = this.iStudentService.findAllEnrolledStudents()
+                .stream()
+                .map(studentModelAssembler::toModel)
+                .toList();
+        return CollectionModel.of(
+                students,
+                linkTo(methodOn(StudentController.class).findAllEnrolledStudents())
+                        .withSelfRel()
+        );
+    }
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/not-enrolled"
+    )
+    public CollectionModel<EntityModel<StudentDTO>> findAllNotEnrolledStudents() {
+        List<EntityModel<StudentDTO>> students = this.iStudentService.findAllNotEnrolledStudents()
+                .stream()
+                .map(studentModelAssembler::toModel)
+                .toList();
+        return CollectionModel.of(
+                students,
+                linkTo(methodOn(StudentController.class).findAllNotEnrolledStudents())
+                        .withSelfRel()
+        );
+    }
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
             "/paged"
     )
     public ResponseEntity<PagedModel<EntityModel<StudentDTO>>> findAllStudyingStudentsPaged(
@@ -164,6 +200,64 @@ public class StudentController {
                 pageable.getSort()
         );
         Page<StudentDTO> studentDTOPage = this.iStudentService.findAllGraduatedStudentsPaged(
+                customPageable
+        );
+        PagedModel<EntityModel<StudentDTO>> entityModelPagedModel = studentDTOPagedResourcesAssembler
+                .toModel(
+                        studentDTOPage,
+                        studentModelAssembler
+                );
+        return ResponseEntity.ok(
+                entityModelPagedModel
+        );
+    }
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/paged/enrolled"
+    )
+    public ResponseEntity<PagedModel<EntityModel<StudentDTO>>> findAllEnrolledStudentsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Pageable pageable
+    ) {
+        Pageable customPageable = PageRequest.of(
+                page,
+                size,
+                pageable.getSort()
+        );
+        Page<StudentDTO> studentDTOPage = this.iStudentService.findAllEnrolledStudentsPaged(
+                customPageable
+        );
+        PagedModel<EntityModel<StudentDTO>> entityModelPagedModel = studentDTOPagedResourcesAssembler
+                .toModel(
+                        studentDTOPage,
+                        studentModelAssembler
+                );
+        return ResponseEntity.ok(
+                entityModelPagedModel
+        );
+    }
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
+    @GetMapping(
+            "/paged/not-enrolled"
+    )
+    public ResponseEntity<PagedModel<EntityModel<StudentDTO>>> findAllNotEnrolledStudentsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Pageable pageable
+    ) {
+        Pageable customPageable = PageRequest.of(
+                page,
+                size,
+                pageable.getSort()
+        );
+        Page<StudentDTO> studentDTOPage = this.iStudentService.findAllNotEnrolledStudentsPaged(
                 customPageable
         );
         PagedModel<EntityModel<StudentDTO>> entityModelPagedModel = studentDTOPagedResourcesAssembler

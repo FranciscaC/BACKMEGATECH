@@ -6,9 +6,6 @@ import gt.com.megatech.persistence.entity.UserEntity;
 import gt.com.megatech.service.implementation.UserDetailServiceImplementation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,31 +32,6 @@ public class UserController {
     public ResponseEntity<List<UserEntity>> findAllUsers() {
         return new ResponseEntity<>(
                 this.userDetailServiceImplementation.findAllUsers(),
-                HttpStatus.OK
-        );
-    }
-
-    @PreAuthorize(
-            "hasAuthority('READ')"
-    )
-    @GetMapping(
-            "/paged"
-    )
-    public ResponseEntity<Page<UserEntity>> findAllUsersPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Pageable pageable
-    ) {
-        Pageable customPageable = PageRequest.of(
-                page,
-                size,
-                pageable.getSort()
-        );
-        Page<UserEntity> usersPage = userDetailServiceImplementation.findAllUsersPaged(
-                customPageable
-        );
-        return new ResponseEntity<>(
-                usersPage,
                 HttpStatus.OK
         );
     }

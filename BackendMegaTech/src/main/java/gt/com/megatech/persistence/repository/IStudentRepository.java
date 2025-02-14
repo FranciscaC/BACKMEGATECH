@@ -52,19 +52,19 @@ public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
 
     @Modifying
     @Query("""
-        UPDATE StudentEntity s 
-        SET s.name = :name,
-            s.cui = :cui,
-            s.personalCode = :personalCode,
-            s.birthDate = :birthDate,
-            s.phone = :phone,
-            s.email = :email,
-            s.address = :address,
-            s.educationLevel = :educationLevel,
-            s.academicStatusEnum = :academicStatusEnum,
-            s.guardianEntity = :guardianEntity
-        WHERE s.id = :id
-    """)
+                UPDATE StudentEntity s 
+                SET s.name = :name,
+                    s.cui = :cui,
+                    s.personalCode = :personalCode,
+                    s.birthDate = :birthDate,
+                    s.phone = :phone,
+                    s.email = :email,
+                    s.address = :address,
+                    s.educationLevel = :educationLevel,
+                    s.academicStatusEnum = :academicStatusEnum,
+                    s.guardianEntity = :guardianEntity
+                WHERE s.id = :id
+            """)
     int updateStudentById(
             @Param("id") Long id,
             @Param("name") String name,
@@ -157,4 +157,12 @@ public interface IStudentRepository extends JpaRepository<StudentEntity, Long> {
             @Param("targetDate") LocalDate targetDate,
             Pageable pageable
     );
+
+    List<StudentEntity> findByEnrollmentEntityIsNotNull();
+
+    List<StudentEntity> findByEnrollmentEntityIsNull();
+
+    Page<StudentEntity> findByEnrollmentEntityIsNotNull(Pageable pageable);
+
+    Page<StudentEntity> findByEnrollmentEntityIsNull(Pageable pageable);
 }

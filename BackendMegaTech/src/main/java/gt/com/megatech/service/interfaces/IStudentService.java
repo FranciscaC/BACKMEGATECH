@@ -14,6 +14,10 @@ public interface IStudentService {
 
     List<StudentDTO> findAllGraduatedStudents();
 
+    List<StudentDTO> findAllEnrolledStudents();
+
+    List<StudentDTO> findAllNotEnrolledStudents();
+
     Page<StudentDTO> findAllStudyingStudentsPaged(
             Pageable pageable
     );
@@ -23,6 +27,14 @@ public interface IStudentService {
     );
 
     Page<StudentDTO> findAllGraduatedStudentsPaged(
+            Pageable pageable
+    );
+
+    Page<StudentDTO> findAllEnrolledStudentsPaged(
+            Pageable pageable
+    );
+
+    Page<StudentDTO> findAllNotEnrolledStudentsPaged(
             Pageable pageable
     );
 

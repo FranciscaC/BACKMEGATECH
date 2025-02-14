@@ -72,6 +72,28 @@ public class StudentServiceImplementation implements IStudentService {
             readOnly = true
     )
     @Override
+    public List<StudentDTO> findAllEnrolledStudents() {
+        return this.iStudentRepository.findByEnrollmentEntityIsNotNull()
+                .stream()
+                .map(this::convertToStudentDTO)
+                .toList();
+    }
+
+    @Transactional(
+            readOnly = true
+    )
+    @Override
+    public List<StudentDTO> findAllNotEnrolledStudents() {
+        return this.iStudentRepository.findByEnrollmentEntityIsNull()
+                .stream()
+                .map(this::convertToStudentDTO)
+                .toList();
+    }
+
+    @Transactional(
+            readOnly = true
+    )
+    @Override
     public Page<StudentDTO> findAllStudyingStudentsPaged(
             Pageable pageable
     ) {
@@ -105,6 +127,28 @@ public class StudentServiceImplementation implements IStudentService {
                 AcademicStatusEnum.GRADUATED,
                 pageable
         ).map(this::convertToStudentDTO);
+    }
+
+    @Transactional(
+            readOnly = true
+    )
+    @Override
+    public Page<StudentDTO> findAllEnrolledStudentsPaged(
+            Pageable pageable
+    ) {
+        return this.iStudentRepository.findByEnrollmentEntityIsNotNull(pageable)
+                .map(this::convertToStudentDTO);
+    }
+
+    @Transactional(
+            readOnly = true
+    )
+    @Override
+    public Page<StudentDTO> findAllNotEnrolledStudentsPaged(
+            Pageable pageable
+    ) {
+        return this.iStudentRepository.findByEnrollmentEntityIsNull(pageable)
+                .map(this::convertToStudentDTO);
     }
 
     @Transactional(

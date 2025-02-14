@@ -5,14 +5,9 @@ import gt.com.megatech.service.assembler.ProfessorModelAssembler;
 import gt.com.megatech.service.interfaces.IProfessorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +29,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProfessorController {
 
     private final ProfessorModelAssembler professorModelAssembler;
-    private final PagedResourcesAssembler<ProfessorDTO> professorDTOPagedResourcesAssembler;
     private final IProfessorService iProfessorService;
 
     @PreAuthorize(
@@ -50,35 +44,6 @@ public class ProfessorController {
                 entityModelList,
                 linkTo(methodOn(ProfessorController.class).findAllProfessors())
                         .withSelfRel()
-        );
-    }
-
-    @PreAuthorize(
-            "hasAuthority('READ')"
-    )
-    @GetMapping(
-            "/paged"
-    )
-    public ResponseEntity<PagedModel<EntityModel<ProfessorDTO>>> findAllProfessorsPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Pageable pageable
-    ) {
-        Pageable customPageable = PageRequest.of(
-                page,
-                size,
-                pageable.getSort()
-        );
-        Page<ProfessorDTO> professorDTOPage = this.iProfessorService.findAllProfessorsPaged(
-                customPageable
-        );
-        PagedModel<EntityModel<ProfessorDTO>> entityModelPagedModel = this.professorDTOPagedResourcesAssembler
-                .toModel(
-                        professorDTOPage,
-                        professorModelAssembler
-                );
-        return ResponseEntity.ok(
-                entityModelPagedModel
         );
     }
 

@@ -18,8 +18,6 @@ import gt.com.megatech.util.constant.SecurityConstant;
 import gt.com.megatech.util.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -179,12 +177,6 @@ public class UserDetailServiceImplementation implements UserDetailsService {
 
     public List<UserEntity> findAllUsers() {
         return iUserRepository.findAll();
-    }
-
-    public Page<UserEntity> findAllUsersPaged(
-            Pageable pageable
-    ) {
-        return iUserRepository.findAll(pageable);
     }
 
     public UserProfileResponseDTO getUserProfileFromToken(

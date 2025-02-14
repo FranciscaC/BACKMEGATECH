@@ -5,14 +5,9 @@ import gt.com.megatech.service.assembler.GuardianModelAssembler;
 import gt.com.megatech.service.interfaces.IGuardianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +29,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class GuardianController {
 
     private final GuardianModelAssembler guardianModelAssembler;
-    private final PagedResourcesAssembler<GuardianDTO> guardianDTOPagedResourcesAssembler;
     private final IGuardianService iGuardianService;
 
     @PreAuthorize(
@@ -57,35 +51,6 @@ public class GuardianController {
             "hasAuthority('READ')"
     )
     @GetMapping(
-            "/paged"
-    )
-    public ResponseEntity<PagedModel<EntityModel<GuardianDTO>>> findAllGuardiansPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Pageable pageable
-    ) {
-        Pageable customPageable = PageRequest.of(
-                page,
-                size,
-                pageable.getSort()
-        );
-        Page<GuardianDTO> guardianDTOPage = this.iGuardianService.findAllGuardiansPaged(
-                customPageable
-        );
-        PagedModel<EntityModel<GuardianDTO>> entityModelPagedModel = guardianDTOPagedResourcesAssembler
-                .toModel(
-                        guardianDTOPage,
-                        guardianModelAssembler
-                );
-        return ResponseEntity.ok(
-                entityModelPagedModel
-        );
-    }
-
-    @PreAuthorize(
-            "hasAuthority('READ')"
-    )
-    @GetMapping(
             "/with-students"
     )
     public CollectionModel<EntityModel<GuardianDTO>> findAllGuardiansWithStudents() {
@@ -97,35 +62,6 @@ public class GuardianController {
                 guardians,
                 linkTo(methodOn(GuardianController.class).findAllGuardiansWithStudents())
                         .withSelfRel()
-        );
-    }
-
-    @PreAuthorize(
-            "hasAuthority('READ')"
-    )
-    @GetMapping(
-            "/paged-with-students"
-    )
-    public ResponseEntity<PagedModel<EntityModel<GuardianDTO>>> findAllGuardiansWithStudentsPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Pageable pageable
-    ) {
-        Pageable customPageable = PageRequest.of(
-                page,
-                size,
-                pageable.getSort()
-        );
-        Page<GuardianDTO> guardianDTOPage = this.iGuardianService.findAllGuardiansWithStudentsPaged(
-                customPageable
-        );
-        PagedModel<EntityModel<GuardianDTO>> entityModelPagedModel = guardianDTOPagedResourcesAssembler
-                .toModel(
-                        guardianDTOPage,
-                        guardianModelAssembler
-                );
-        return ResponseEntity.ok(
-                entityModelPagedModel
         );
     }
 

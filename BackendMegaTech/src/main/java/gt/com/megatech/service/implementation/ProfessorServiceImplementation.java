@@ -6,8 +6,6 @@ import gt.com.megatech.presentation.dto.ProfessorDTO;
 import gt.com.megatech.service.exception.ProfessorNotFoundException;
 import gt.com.megatech.service.interfaces.IProfessorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +26,6 @@ public class ProfessorServiceImplementation implements IProfessorService {
                 .stream()
                 .map(this::convertToProfessorDTO)
                 .toList();
-    }
-
-    @Transactional(
-            readOnly = true
-    )
-    @Override
-    public Page<ProfessorDTO> findAllProfessorsPaged(
-            Pageable pageable
-    ) {
-        return this.iProfessorRepository.findAll(pageable)
-                .map(this::convertToProfessorDTO);
     }
 
     @Transactional(

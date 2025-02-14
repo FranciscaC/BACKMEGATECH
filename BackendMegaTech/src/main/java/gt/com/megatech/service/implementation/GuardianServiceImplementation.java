@@ -8,8 +8,6 @@ import gt.com.megatech.service.exception.GraduatedStudentNotFoundException;
 import gt.com.megatech.service.exception.GuardianNotFoundException;
 import gt.com.megatech.service.interfaces.IGuardianService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,33 +41,11 @@ public class GuardianServiceImplementation implements IGuardianService {
             readOnly = true
     )
     @Override
-    public Page<GuardianDTO> findAllGuardiansPaged(
-            Pageable pageable
-    ) {
-        return this.iGuardianRepository.findAll(pageable)
-                .map(this::convertToGuardianDTOWithoutStudents);
-    }
-
-    @Transactional(
-            readOnly = true
-    )
-    @Override
     public List<GuardianDTO> findAllGuardiansWithStudents() {
         return this.iGuardianRepository.findAllGuardiansWithStudents()
                 .stream()
                 .map(this::convertToGuardianDTO)
                 .toList();
-    }
-
-    @Transactional(
-            readOnly = true
-    )
-    @Override
-    public Page<GuardianDTO> findAllGuardiansWithStudentsPaged(
-            Pageable pageable
-    ) {
-        return this.iGuardianRepository.findAllGuardiansWithStudents(pageable)
-                .map(this::convertToGuardianDTO);
     }
 
     @Transactional(
