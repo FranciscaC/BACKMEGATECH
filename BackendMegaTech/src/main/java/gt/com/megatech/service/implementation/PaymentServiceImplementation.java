@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -221,47 +222,62 @@ public class PaymentServiceImplementation implements IPaymentService {
         return this.convertToPaymentDTO(paymentEntity);
     }
 
+    @Transactional(
+            readOnly = true
+    )
+    @Override
+    public List<PaymentDTO> findAllPaymentsByStudentId(
+            Long studentId
+    ) {
+        return this.iPaymentRepository.findByStudentEntity_Id(studentId)
+                .stream()
+                .map(this::convertToPaymentDTO)
+                .toList();
+    }
+
     @Transactional
     @Override
-    public List<PaymentDTO> savePayments(
-            PaymentRequestDTO paymentRequestDTO
-    ) {
+    public List<PaymentDTO> savePayments(PaymentRequestDTO paymentRequestDTO) {
         StudentEntity studentEntity = this.iStudentRepository.findById(
-                        paymentRequestDTO.getStudentId()
-                )
-                .orElseThrow(() -> new StudentNotFoundException(paymentRequestDTO.getStudentId()));
+                paymentRequestDTO.getStudentId()
+        ).orElseThrow(() -> new StudentNotFoundException(paymentRequestDTO.getStudentId()));
         if (!studentEntity.getAcademicStatusEnum().equals(AcademicStatusEnum.STUDYING)) {
-            throw new IllegalStateException(
-                    "Only students with STUDYING status can make payments."
-            );
+            throw new IllegalStateException("Only students with STUDYING status can make payments.");
         }
         if (paymentRequestDTO.getPaymentDetailDTOS().size() > 24) {
-            throw new IllegalArgumentException(
-                    "Cannot pay for more than 24 months."
-            );
+            throw new IllegalArgumentException("Cannot pay for more than 24 months.");
         }
         for (PaymentDetailDTO paymentDetailDTO : paymentRequestDTO.getPaymentDetailDTOS()) {
             boolean exists = this.iPaymentRepository.existsByStudentEntityAndMonthEnumAndYear(
-                    studentEntity, paymentDetailDTO.getMonthEnum(), paymentDetailDTO.getYear()
+                    studentEntity,
+                    paymentDetailDTO.getMonthEnum(),
+                    paymentDetailDTO.getYear()
             );
-
             if (exists) {
-                throw new IllegalStateException(
-                        "Payment for "
-                                + paymentDetailDTO.getMonthEnum()
-                                + " "
-                                + paymentDetailDTO.getYear()
-                                + " already exists."
-                );
+                throw new IllegalStateException("Payment for "
+                        + paymentDetailDTO.getMonthEnum()
+                        + " "
+                        + paymentDetailDTO.getYear()
+                        + " already exists.");
             }
         }
-        List<PaymentEntity> paymentEntityList = convertToPaymentEntities(
-                paymentRequestDTO,
-                studentEntity
-        );
-        List<PaymentEntity> savedPayments = this.iPaymentRepository.saveAll(
-                paymentEntityList
-        );
+        List<PaymentDetailDTO> paymentDetails = paymentRequestDTO.getPaymentDetailDTOS();
+        if (paymentDetails.size() > 1) {
+            List<String> monthNames = new ArrayList<>();
+            for (int i = 0; i < paymentDetails.size(); i++) {
+                PaymentDetailDTO detail = paymentDetails.get(i);
+                monthNames.add(detail.getMonthEnum().name());
+                if (i < paymentDetails.size() - 1) {
+                    detail.setAmountPaid(BigDecimal.ZERO);
+                    detail.setLateFee(BigDecimal.ZERO);
+                    detail.setNotes("PAGO");
+                } else {
+                    detail.setNotes("PAGO, " + String.join(", ", monthNames));
+                }
+            }
+        }
+        List<PaymentEntity> paymentEntityList = convertToPaymentEntities(paymentRequestDTO, studentEntity);
+        List<PaymentEntity> savedPayments = this.iPaymentRepository.saveAll(paymentEntityList);
         return savedPayments.stream()
                 .map(this::convertToPaymentDTO)
                 .toList();

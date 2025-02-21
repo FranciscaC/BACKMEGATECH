@@ -70,6 +70,7 @@ public class GuardianEntity {
             message = "The phone must not be empty"
     )
     @Size(
+            min = 8,
             max = 8,
             message = "The phone number must be exactly 8 characters long."
     )

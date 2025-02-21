@@ -210,6 +210,21 @@ public class PaymentController {
     }
 
     @PreAuthorize(
+            "hasAnyAuthority('READ')"
+    )
+    @GetMapping(
+            "/student/{studentId}"
+    )
+    public ResponseEntity<List<PaymentDTO>> findAllPaymentsByStudentId(
+            @PathVariable Long studentId
+    ) {
+        List<PaymentDTO> paymentDTOList = this.iPaymentService.findAllPaymentsByStudentId(
+                studentId
+        );
+        return ResponseEntity.ok(paymentDTOList);
+    }
+
+    @PreAuthorize(
             "hasAuthority('CREATE')"
     )
     @PostMapping

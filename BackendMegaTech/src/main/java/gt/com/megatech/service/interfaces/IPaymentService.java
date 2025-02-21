@@ -39,6 +39,10 @@ public interface IPaymentService {
             Long id
     );
 
+    List<PaymentDTO> findAllPaymentsByStudentId(
+            Long studentId
+    );
+
     List<PaymentDTO> savePayments(
             PaymentRequestDTO paymentRequestDTO
     );
