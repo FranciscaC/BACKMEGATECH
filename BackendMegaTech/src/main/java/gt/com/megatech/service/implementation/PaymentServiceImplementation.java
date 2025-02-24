@@ -39,6 +39,17 @@ public class PaymentServiceImplementation implements IPaymentService {
             readOnly = true
     )
     @Override
+    public List<PaymentDTO> findAllPayments() {
+        return this.iPaymentRepository.findAll().
+                stream()
+                .map(this::convertToPaymentDTO)
+                .toList();
+    }
+
+    @Transactional(
+            readOnly = true
+    )
+    @Override
     public List<PaymentDTO> findAllPaymentsByMonthAndYear(
             MonthEnum monthEnum,
             Integer year

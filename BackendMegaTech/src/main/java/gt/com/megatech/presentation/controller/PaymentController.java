@@ -45,6 +45,17 @@ public class PaymentController {
     @PreAuthorize(
             "hasAuthority('READ')"
     )
+    @GetMapping(
+            "/all"
+    )
+    public ResponseEntity<List<PaymentDTO>> findAllPayments() {
+        List<PaymentDTO> payments = this.iPaymentService.findAllPayments();
+        return ResponseEntity.ok(payments);
+    }
+
+    @PreAuthorize(
+            "hasAuthority('READ')"
+    )
     @GetMapping
     public CollectionModel<EntityModel<PaymentDTO>> findAllPaymentsByMonthAndYear(
             @RequestParam MonthEnum monthEnum,

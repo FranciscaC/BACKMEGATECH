@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface IPaymentService {
 
+    List<PaymentDTO> findAllPayments();
+
     List<PaymentDTO> findAllPaymentsByMonthAndYear(
             MonthEnum monthEnum,
             Integer year
