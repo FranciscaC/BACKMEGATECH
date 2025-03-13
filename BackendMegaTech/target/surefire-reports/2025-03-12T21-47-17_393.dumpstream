@@ -1,0 +1,5 @@
+# Created at 2025-03-12T21:47:17.896
+Boot Manifest-JAR contains absolute paths in classpath 'D:\FREELANCE\BACKMEGATECH\BackendMegaTech\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

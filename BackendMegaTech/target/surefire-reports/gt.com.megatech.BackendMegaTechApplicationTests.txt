@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: gt.com.megatech.BackendMegaTechApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 42.19 s -- in gt.com.megatech.BackendMegaTechApplicationTests
