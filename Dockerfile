@@ -1,5 +1,5 @@
 # Step 1: Building the project with Maven
-FROM maven:3.9.2-eclipse-temurin-21 AS builder
+FROM maven:3.9.2-eclipse-temurin:21 AS builder
 WORKDIR /app
 
 # Copy the pom.xml file and download the dependencies (cache optimization)
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests -Pproduction
 
 # Stage 2: Light Production Image with JRE
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine-3.21
 WORKDIR /app
 
 # Copy the jar generated in the previous step
