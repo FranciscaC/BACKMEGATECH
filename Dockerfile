@@ -1,5 +1,5 @@
 # Etapa 1: Construcción del proyecto con Maven
-FROM maven:3.9.2-eclipse-temurin-21 AS builder
+FROM maven:3.9.2-eclipse-temurin-17 AS builder
 WORKDIR /app
 
 # Copiar el pom.xml y descargar las dependencias (optimización de cache)
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests -Pproduction
 
 # Etapa 2: Imagen de Producción ligera con OpenJDK 21
-FROM openjdk:21-jdk-slim
+FROM openjdk:17-alpine
 WORKDIR /app
 
 # Copiar el jar generado en la etapa anterior
