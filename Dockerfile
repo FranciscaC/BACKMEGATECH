@@ -1,24 +1,24 @@
-# Step 1: Build the project with Maven
-FROM maven:3.9.2-eclipse-temurin:21 AS builder
+# Etapa 1: Construcción del proyecto con Maven
+FROM maven:3.9.2-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# Copy the pom.xml file and download dependencies (cache optimization)
+# Copiar el pom.xml y descargar las dependencias (optimización de cache)
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline
 
-# Copy the rest of the source code and compile the project
+# Copiar el resto del código fuente y compilar el proyecto
 COPY src ./src
 RUN mvn clean package -DskipTests -Pproduction
 
-# Stage 2: Light Production Image with JRE
-FROM eclipse-temurin:21-jre-alpine-3.21
+# Etapa 2: Imagen de Producción ligera con OpenJDK 21
+FROM openjdk:21-jdk-slim
 WORKDIR /app
 
-# Copy the jar file generated in the previous step
+# Copiar el jar generado en la etapa anterior
 COPY --from=builder /app/target/*.jar app.jar
 
-# Expose the port the application will listen on (adjust according to your configuration)
+# Exponer el puerto en el que la aplicación escuchará
 EXPOSE 8080
 
-# Run the application with Java
+# Nota: Las variables de entorno se inyectan en tiempo de ejecución en Railway
 ENTRYPOINT ["java", "-jar", "app.jar"]
