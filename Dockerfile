@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests -Pproduction
 
 # Stage 2: Light Production Image with JRE
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine-3.21
 WORKDIR /app
 
 # Copy the jar file generated in the previous step
