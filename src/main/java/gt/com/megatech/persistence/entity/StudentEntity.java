@@ -68,8 +68,8 @@ public class StudentEntity {
             message = "The personal code must not be empty"
     )
     @Size(
-            min = 10,
-            max = 10,
+            min = 5,
+            max = 7,
             message = "The personal code must be exactly 10 characters long."
     )
     @Pattern(
