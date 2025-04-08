@@ -111,9 +111,6 @@ public class StudentEntity {
     )
     private String phone;
 
-    @NotBlank(
-            message = "The email must not be empty."
-    )
     @Email(
             message = "The email must be valid."
     )
@@ -123,7 +120,7 @@ public class StudentEntity {
     )
     @Column(
             length = 100,
-            nullable = false,
+            nullable = true,
             unique = true
     )
     private String email;
