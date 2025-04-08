@@ -70,7 +70,7 @@ public class StudentEntity {
     @Size(
             min = 5,
             max = 7,
-            message = "The personal code must be exactly 10 characters long."
+            message = "The personal code must be between 5 and 7 characters."
     )
     @Pattern(
             regexp = "^[a-zA-Z0-9-]{10}$",
@@ -128,9 +128,7 @@ public class StudentEntity {
     )
     private String email;
 
-    @NotBlank(
-            message = "The address must not be empty"
-    )
+        
     @Size(
             min = 10,
             max = 200,
@@ -138,7 +136,7 @@ public class StudentEntity {
     )
     @Column(
             length = 200,
-            nullable = false
+            nullable = true
     )
     private String address;
 
