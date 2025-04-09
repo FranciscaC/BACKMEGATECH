@@ -34,9 +34,6 @@ public class EnrollmentEntity {
     @NotNull(
             message = "The enrollment date must not be empty"
     )
-    @PastOrPresent(
-            message = "The enrollment date must be in the past or present"
-    )
     @Column(
             name = "enrollment_date",
             nullable = false
