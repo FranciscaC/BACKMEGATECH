@@ -70,11 +70,11 @@ public class StudentEntity {
             message = "The personal code must be between 5 and 7 characters."
     )
     @Pattern(
-            regexp = "^[a-zA-Z0-9-]{10}$",
+            regexp = "^[a-zA-Z0-9-]{7}$",
             message = "The personal code must contain only letters, digits, or hyphens and be exactly 10 characters."
     )
     @Column(
-            length = 10,
+            length = 7,
             nullable = true,
             unique = true
     )
