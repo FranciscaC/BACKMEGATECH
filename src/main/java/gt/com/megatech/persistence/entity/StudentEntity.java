@@ -64,9 +64,6 @@ public class StudentEntity {
     )
     private String cui;
 
-    @NotBlank(
-            message = "The personal code must not be empty"
-    )
     @Size(
             min = 5,
             max = 7,
@@ -78,7 +75,7 @@ public class StudentEntity {
     )
     @Column(
             length = 10,
-            nullable = false,
+            nullable = true,
             unique = true
     )
     private String personalCode;
@@ -88,13 +85,10 @@ public class StudentEntity {
     )
     @Column(
             name = "birth_date",
-            nullable = false
+            nullable = true
     )
     private LocalDate birthDate;
 
-    @NotBlank(
-            message = "The phone must not be empty"
-    )
     @Size(
             min = 8,
             max = 8,
@@ -106,7 +100,7 @@ public class StudentEntity {
     )
     @Column(
             length = 8,
-            nullable = false,
+            nullable = true,
             unique = true
     )
     private String phone;
@@ -137,17 +131,13 @@ public class StudentEntity {
     )
     private String address;
 
-
-    @NotBlank(
-            message = "The education level must not be empty."
-    )
     @Size(
             max = 50,
             message = "The education level must not exceed 50 characters."
     )
     @Column(
             name = "education_level",
-            nullable = false,
+            nullable = true,
             length = 50
     )
     private String educationLevel;
