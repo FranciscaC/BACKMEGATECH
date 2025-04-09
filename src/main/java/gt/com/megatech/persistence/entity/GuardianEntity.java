@@ -66,9 +66,6 @@ public class GuardianEntity {
     )
     private String dpi;
 
-    @NotBlank(
-            message = "The phone must not be empty"
-    )
     @Size(
             min = 8,
             max = 8,
@@ -80,14 +77,11 @@ public class GuardianEntity {
     )
     @Column(
             length = 8,
-            nullable = false,
+            nullable = true,
             unique = true
     )
     private String phone;
 
-    @NotBlank(
-            message = "The address must not be empty"
-    )
     @Size(
             min = 5,
             max = 200,
@@ -95,7 +89,7 @@ public class GuardianEntity {
     )
     @Column(
             length = 200,
-            nullable = false
+            nullable = true
     )
     private String address;
 
