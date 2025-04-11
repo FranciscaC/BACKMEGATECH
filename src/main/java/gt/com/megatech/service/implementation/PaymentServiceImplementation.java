@@ -274,17 +274,11 @@ public class PaymentServiceImplementation implements IPaymentService {
         }
         List<PaymentDetailDTO> paymentDetails = paymentRequestDTO.getPaymentDetailDTOS();
         if (paymentDetails.size() > 1) {
-            List<String> monthNames = new ArrayList<>();
-            for (int i = 0; i < paymentDetails.size(); i++) {
+            for (int i = 0; i < paymentDetails.size() - 1; i++) {
                 PaymentDetailDTO detail = paymentDetails.get(i);
-                monthNames.add(detail.getMonthEnum().name());
-                if (i < paymentDetails.size() - 1) {
-                    detail.setAmountPaid(BigDecimal.ZERO);
-                    detail.setLateFee(BigDecimal.ZERO);
-                    detail.setNotes("PAGO");
-                } else {
-                    detail.setNotes("PAGO, " + String.join(", ", monthNames));
-                }
+                detail.setAmountPaid(BigDecimal.ZERO);
+                detail.setLateFee(BigDecimal.ZERO);
+                detail.setNotes("");
             }
         }
         List<PaymentEntity> paymentEntityList = convertToPaymentEntities(paymentRequestDTO, studentEntity);
