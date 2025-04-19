@@ -57,7 +57,9 @@ public class BackendMegaTechApplication {
                     .roleEnum(RoleEnum.USER)
                     .permissionList(Set.of(
                             readPermission,
-                            createPermission))
+                            createPermission,
+                            updatePermission,
+                            deletePermission))
                     .build();
 
             // Creating users
